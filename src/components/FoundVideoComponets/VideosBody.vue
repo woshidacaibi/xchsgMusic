@@ -1,13 +1,15 @@
 <template>
   <div class="Video-body-container">
-    <div class="recommend-row">
-      <div class="mv-container" :key="item.id" v-for="item in videosInfo">
-        <VideoSingleItem v-if="type === 'videos' " :type="'video'" :videoInfo="item"/>
-        <VideoSingleItem v-else-if="type === 'mvs' " :type="'mv'" :videoInfo="item"/>
+    <template>
+      <div class="recommend-row">
+        <div class="mv-container" :key="item.id" v-for="item in videosInfo">
+          <VideoSingleItem v-if="type === 'videos' " :type="'video'" :videoInfo="item"/>
+          <VideoSingleItem v-else-if="type === 'mvs' " :type="'mv'" :videoInfo="item"/>
+        </div>
       </div>
-    </div>
-    <div v-if="isBottom">没有更多了</div>
-    <div v-if="this.offset === 0">请求过多，被网易云服务器发现了呜呜呜/(ㄒoㄒ)/~~ 左上角选个标签吧</div>
+      <div v-if="isBottom">没有更多了</div>
+      <div v-if="offset === 0 && isload">请求过多，被网易云服务器发现了呜呜呜/(ㄒoㄒ)/~~ 左上角选个标签吧</div>
+    </template>
     <Loading :isload="isload" cover-name="Video-body" :text="'获取更多视频中'"></Loading>
   </div>
 </template>
@@ -73,7 +75,6 @@ export default {
           }
         })
       }
-      console.log(res)
       if (!res.data.hasmore) {
         this.isBottom = true
       }

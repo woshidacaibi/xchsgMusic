@@ -34,7 +34,11 @@ export default {
   },
   methods: {
     async getRankListMessage () {
-      const res = await this.$http.get('/toplist')
+      const res = await this.$http.get('/toplist', {
+        params: {
+          cookie: localStorage.getItem('cookie')
+        }
+      })
       this.RankMessage = [...res.data.list]
       this.isload = true
     },
@@ -76,6 +80,7 @@ export default {
 .RankingListPanel-container{
   padding-top: 5px;
   padding-left: 25px;
+  padding-right: 25px;
 }
 .RankingListPanel-cover{
   height: 200px;

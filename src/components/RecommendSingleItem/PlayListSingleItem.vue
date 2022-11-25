@@ -77,11 +77,11 @@ export default {
           params: {
             id: this.playlistInfo.id,
             limit: 1000,
-            offset: offset
+            offset: offset,
+            cookie: localStorage.getItem('cookie')
           }
         })
         songs.push(...res.data.songs)
-        console.log(songs)
         offset += 1000
       }
       this.$store.commit('UPDATESONGLIST', songs)

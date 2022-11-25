@@ -51,10 +51,7 @@ export default {
   },
   methods: {
     async getEverydayData () {
-      await this.$http.get('/banner').then(res => {
-        this.banners = [...res.data.banners]
-      })
-      const recomv = await this.$http.get('/personalized/mv')
+      const recomv = await this.$http.get('/personalized/mv', { params: { cookie: localStorage.getItem('cookie') } })
       this.recomv = [...recomv.data.result]
       this.isload = true
     },

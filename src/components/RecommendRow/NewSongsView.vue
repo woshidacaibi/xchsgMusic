@@ -36,7 +36,7 @@ export default {
   },
   methods: {
     async getNewSongs () {
-      const res = await this.$http.get(`/top/song?type=${this.areaId}`)
+      const res = await this.$http.get(`/top/song?type=${this.areaId}`, { params: { cookie: localStorage.getItem('cookie') } })
       this.newSongs = [...res.data.data]
       this.isload = true
     },
@@ -46,13 +46,12 @@ export default {
         idArr.push(val.id)
       })
       const idStr = idArr.join(',')
-      // console.log(idStr)
       const res = await this.$http.get('/song/detail', {
         params: {
-          ids: idStr
+          ids: idStr,
+          cookie: localStorage.getItem('cookie')
         }
       })
-      console.log(res)
       const tracks = [...res.data.songs]
       this.$store.commit('UPDATESONGLIST', tracks)
     }

@@ -26,7 +26,8 @@ export default {
     async getEverydayData () {
       const exlusiveRelease = await this.$http.get('/personalized/privatecontent/list', {
         params: {
-          limit: 3
+          limit: 3,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.exclusiveRelease = [...exlusiveRelease.data.result]

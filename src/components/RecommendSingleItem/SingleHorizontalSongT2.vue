@@ -3,7 +3,7 @@
     <div class="indexAndImg">
       <span>{{ index>=10?index:'0'+index }}</span>
       <div @click="playClickSong" class="cover-img">
-        <el-image lazy :src="songInfo.album.picUrl+'?parma20y20'">
+        <el-image lazy :src="songInfo.album.blurPicUrl+'?param=80y80'">
           <div slot="placeholder" class="image-slot">
             加载中<span class="dot">...</span>
           </div>
@@ -53,7 +53,11 @@ export default {
   props: ['songInfo', 'index'],
   methods: {
     async playClickSong () {
-      const res = await this.$http.get(`/song/detail?ids=${this.songInfo.id}`)
+      const res = await this.$http.get(`/song/detail?ids=${this.songInfo.id}`, {
+        params: {
+          cookie: localStorage.getItem('cookie')
+        }
+      })
       const item = res.data.songs[0]
       if (item.noCopyrightRcmd !== null) {
         this.$notify.error({
@@ -143,7 +147,7 @@ export default {
         margin-top: 44px;
         width: 35px;
         height: 12px;
-        line-height: 12px;
+        line-height: 8px;
         font-weight: normal;
         border-radius: 5px;
         border: #ec4141 1.5px solid;

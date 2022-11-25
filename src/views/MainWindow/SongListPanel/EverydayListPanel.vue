@@ -11,7 +11,7 @@
       <button class="playAll" @click="updateSonglist"><i class="iconfont icon-bofang1"></i>播放全部</button>
     </div>
     <div class="list">
-      <SongList :tracks="tracks" :type="'songList'"></SongList>
+      <SongList :tracks="tracks" :islistload = "true" :type="'songList'"></SongList>
     </div>
   </div>
 </template>

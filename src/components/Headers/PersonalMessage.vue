@@ -11,9 +11,13 @@
 export default {
   name: 'PersonalMessage',
   methods: {
-    logout () {
+    async logout () {
       localStorage.removeItem('cookie')
-      location.reload()
+      this.$store.state.islogin = false
+      this.$http.get('/register/anonimous').then(res => {
+        localStorage.setItem('cookie', res.data.cookie)
+        location.reload()
+      })
     }
   }
 }

@@ -129,7 +129,6 @@ export default new Vuex.Store({
       if (index === -1) { context.commit('PUSHSONGTOLIST', value) } else {
         context.state.currentIndex = index
         context.state.currentMusic = context.state.playsongList[context.state.currentIndex]
-        console.log(666)
         localStorage.setItem('historySongList', JSON.stringify(context.state.playsongList))
         localStorage.setItem('historyListIndex', JSON.stringify(context.state.currentIndex))
       }

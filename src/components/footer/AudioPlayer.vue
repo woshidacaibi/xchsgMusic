@@ -6,34 +6,37 @@
         <img v-else src='@/assets/default_cover.jpg' alt="">
       </div>
       <div class="right">
-        <a href="#" class="musicName long" :title="songName" v-if="nameLength>10">
+        <a class="musicName long" :title="songName" v-if="nameLength>20">
             <span class="name"  >{{ currentMusic.name }}
             <span class="alia" v-if="currentMusic.alia[0]">
             ({{ currentMusic.alia[0] }})</span>
             </span>
-          <span class="name">{{ currentMusic.name }}
-            <span class="alia" v-if="currentMusic.alia[0]">
-            ({{ currentMusic.alia[0] }})</span>
-            </span>
-        </a>
-        <a href="#" class="musicName elipse" :title="songName" v-else>
             <span class="name">{{ currentMusic.name }}
             <span class="alia" v-if="currentMusic.alia[0]">
             ({{ currentMusic.alia[0] }})</span>
             </span>
         </a>
-        <a href="#" class="artist long " :title="artistsName" v-if="artistNameLength>15">
+        <a class="musicName elipse" :title="songName" v-else>
+            <span class="name">{{ currentMusic.name }}
+            <span class="alia" v-if="currentMusic.alia[0]">
+            ({{ currentMusic.alia[0] }})</span>
+            </span>
+        </a>
+        <a href="#" class="artist long " :title="artistsName" v-if="artistNameLength>30">
           <span class="name">
-            <span v-for="item in currentMusic.ar" :key="item.name">{{ item.name }}/</span>
+            <router-link :to="{path:'/SingerPanel',query:{singerId:item.id}}" v-for="(item,index) in currentMusic.ar" :key="item.name">
+              {{ item.name }}
+              <b v-if="index<currentMusic.ar.length-1">/</b></router-link>
           </span>
           <span class="name">
-            <span v-for="item in currentMusic.ar" :key="item.name">{{ item.name }}/</span>
+            <router-link :to="{path:'/SingerPanel',query:{singerId:item.id}}" v-for="(item,index) in currentMusic.ar" :key="item.name">
+              {{ item.name }}
+              <b v-if="index<currentMusic.ar.length-1">/</b></router-link>
           </span>
-<!--          <span class="name" v-for="item in currentMusic.ar" :key="item.id+1" style="margin: 0;padding-right: 12px">{{ item.name }}</span>-->
         </a>
         <a href="#" class="artist elipse" :title="artistsName" v-else>
-          <span class="name" v-for="(item,index) in currentMusic.ar" :key="item.name"
-                style="margin: 0;padding-right: 2px">{{ item.name }}<b v-if="index<currentMusic.ar.length-1">/</b></span>
+          <router-link :to="{path:'/SingerPanel',query:{singerId:item.id}}" class="name" v-for="(item,index) in currentMusic.ar" :key="item.name"
+                       style="margin: 0;padding-right: 2px">{{ item.name }}<b v-if="index<currentMusic.ar.length-1">/</b></router-link>
         </a>
       </div>
     </div>
@@ -92,6 +95,7 @@
 
 <script>
 import SongList from '@/components/ListPanel/SongList'
+import Clipboard from 'clipboard'
 // 音频播放插件
 export default {
   name: 'VideoPlayer',
@@ -113,7 +117,8 @@ export default {
       artistsName: '',
       timer: null,
       timerDuration: null,
-      clientHeight: document.documentElement.clientHeight
+      clientHeight: document.documentElement.clientHeight,
+      messageBoxTimer: null
     }
   },
   components: {
@@ -146,6 +151,37 @@ export default {
       await this.getMusicByid()
       this.play()
     },
+    copy (text) {
+      // .uni-btn 点击复制按钮的class
+      const clipboard = new Clipboard('#uni-btn', {
+        // 最关键的一步，弹框会自动focus 所以要调整container
+        container: document.querySelector('.el-message-box')
+      })
+      clipboard.on('success', e => {
+        // 释放内存
+        this.$message({
+          message: '复制成功，复制到手机网页后用网易云打开即可',
+          type: 'success',
+          duration: 1500
+        })
+        clipboard.destroy()
+      })
+      clipboard.on('error', e => {
+        // 不支持复制
+        this.$message({
+          message: '该浏览器不支持自动复制',
+          type: 'warning'
+        })
+        // 释放内存
+        clipboard.destroy()
+      })
+      // const copyContent = document.createElement('input') // 创建一个隐藏input（重要！）
+      // copyContent.value = '123456' // 拼接多个赋值
+      // document.querySelector('.el-message-box').appendChild(copyContent)
+      // copyContent.select() // 选择对象
+      // document.execCommand('Copy') // 执行浏览器复制命令
+      // this.$message.success('复制成功！')
+    },
     // 通过currentID 获得url
     async getMusicByid () {
       if (this.currentMusic.id === -1) {
@@ -154,19 +190,83 @@ export default {
         this.nowTime = ''
         return
       }
-      const result = await this.$http.get('/song/url/v1', {
+      let result = await this.$http.get('/song/url/v1', {
         params: {
           id: this.currentMusic.id,
-          level: 'exhigh'
+          level: 'exhigh',
+          cookie: localStorage.getItem('cookie')
         }
+      }).catch(err => {
+        console.log(err)
       })
+      if (result.data.code === -462 && !this.$store.state.islogin) {
+        result = await this.$http.get('/song/url/v1', {
+          params: {
+            id: this.currentMusic.id,
+            level: 'exhigh',
+            cookie: 'MUSIC_R_T=1502103233844; MUSIC_A_T=1502103211190; _ntes_nnid=417a547277afa5802040c5b4bb920769,1662424417712; _ntes_nuid=417a547277afa5802040c5b4bb920769; NMTID=00OdfnZFrhQYsXr40Pxm3vWCiQRjrAAAAGDEDeKfg; WEVNSM=1.0.0; WNMCID=kfcqij.1662424417957.01.0; WM_TID=uu5f7ndBTx9BUQBUBAOVTkdQHzuEtr%2B%2F; ntes_kaola_ad=1; __snaker__id=lpTtLGIDAdVqVJT0; YD00000558929251%3AWM_TID=LIgHu4gzua1BQREVEAKANBX9TDYRovnm; from=bdjj20210916B8154; hb_MA-9F44-2FC2BD04228F_source=yunxin.163.com; __bid_n=184a3a3a389d1035f14207; gdxidpyhxdE=BlUIgBKrH%5C7g8oH98ddR%2BwGTApGk%2Fbh9nzuJaKDqShmRUdiz7da6H0tmLCK94VSnh805JZ8iN16jen1ZBWuSY7LSnH8hzAu3KkKRnSAcGJRVvbYal0Lj0Xces2JQrBjeBz1yWzqfhDaR%2BhA%5CllrW%5C7pqmzRSqda%5COG6wq3YRoJ%5Cnwn51%3A1669262153576; YD00000558929251%3AWM_NI=5kElvy1FCVnSUB9Gtdtrhy3QB8ZD1tiPBbfn4YezwCHIxbeauWMUErNeRxjkPVmvmuecu5fd8DxtK4WHDug5OXB8Z4RA%2B2ZFkguiyVV53opMss80PN0qfeyhMQRRKCN6NHQ%3D; YD00000558929251%3AWM_NIKE=9ca17ae2e6ffcda170e2e6eed2f64ff3f5bea8b554a8a88bb2c54e969b9fb1d1428eeff98bf370f78fa9a2f02af0fea7c3b92af7b58b8df573f39a8db7ed59979ef7a8f770b8aea89ab25b82e896a5b480ab908e83e566f887ab9bf6498c97b883e86bb78983b6c87a8ebb9e99e961948aa397f07fa7bdbbd6e570fc9cb895ca4095988c96e63f8d888ed9d940929fe5d3d94ea9b9bb8afc5e96ebfd90f347b1adf8d1d346f4afaa86fc648f8f9eb3ca498eea82a9d437e2a3; _iuqxldmzr_=32; JSESSIONID-WYYY=Keyq%5CxRcTCZ94jQJyIXm5%2F19qupA2eZEHThfvoxs%2FvBZZSk1fR2q0jr8TDaqEwJiAglH9lPcUcquvZ0YmdirM9SokXKUti8Ii%5CKsopZVdurxbc2%5CITeyUw4Bvtlb5%5CFleAuoeDuKE4SKQbj1BfDqqT1O1DiphuIuDRs%2Ba9MPb5wOpnWq%3A1669342517100; WM_NI=%2BdsD0CzouWfejx291uj6%2FtUkIkHiOT6djHSxY%2FU8GAsmWcoktk%2FtxSGFc0ep0KP7zqhGc09NObEAdHWX7sSCao76w%2BGG0IDWwanr8isfxfYsJe8Kb8Z%2F1RFbQ2HLzp0PZms%3D; WM_NIKE=9ca17ae2e6ffcda170e2e6eeccd24494f1f8a5b56b90b48ea7d84a969a9eadd8478aeea486e941ad98a4b4f02af0fea7c3b92ae9bcbda5b349bab1bbb8e56faaa8fedab47faaeae195d8618bb5888ace60f6bca6a9d2749bf19bd9c64bb1b39984ee61b8b5e195fb59859aadd1e87cf495a0d8f97bac99add1bc468dbe8ba2e7449588f994d249a3b1f9d7f621859900aac75db5bfa293bb63b1bab887dc798abbf8ace1349af1ffb3c56a93ee88adf97cf490968ef237e2a3'
+          }
+        }).catch(err => {
+          console.log(err)
+        })
+      }
+      if (result.data.code === -462) {
+        if (this.messageBoxTimer === null) {
+          const h = this.$createElement
+          const copy = h('button', {
+            class: 'uni-btn',
+            style: {
+              border: 'none',
+              color: 'rgba(64,158,255,0.78)',
+              'background-color': 'white',
+              cursor: 'pointer'
+            },
+            attrs: {
+              id: 'uni-btn',
+              'data-clipboard-text': result.data.data.url
+            },
+            on: {
+              click: this.copy
+            }
+          }, '点我复制链接')
+          this.$msgbox({
+            title: '警告',
+            type: 'warning',
+            message: h('p', null, [
+              h('span', null, '抱歉，被安全检测了，游客请直接登录，已登录的请复制下方链接后打开手机浏览器。'),
+              copy,
+              h('div', {
+                style: {
+                  'font-size': '13px',
+                  color: 'red'
+                }
+              }, '若不解除可能会影响使用哦(比如听不了歌/(ㄒoㄒ)/~~)')
+            ]),
+            confirmButtonText: this.$store.state.islogin ? '确认' : '立即登录',
+            beforeClose: (action, instance, done) => {
+              if (action === 'confirm' && !this.$store.state.islogin) {
+                this.$store.state.logining = true
+                done()
+              } else if (action === 'cancel') {
+                done()
+              } else {
+                done()
+              }
+            }
+          })
+          this.messageBoxTimer = setTimeout(() => {
+            this.messageBoxTimer = null
+          }, 30000)
+          return
+        }
+      }
       if (!result.data.data[0].url && this.currentMusic.id !== -1) {
         this.$notify.error({
           title: '失败',
           message: this.$store.state.currentMusic.name + '无法获取音频资源已自动跳过'
         })
         this.$store.state.playsongList.splice(this.$store.state.currentIndex, 1)
-        if (this.$store.state.playsongList.length > 0) {
+        if (this.$store.state.playsongList.length > 1) {
           this.next()
         } else {
           this.$store.state.currentMusic = this.$store.state.errorMusic
@@ -340,6 +440,9 @@ export default {
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
+    a{
+      display: inline-block;
+    }
   }
   .message-panel {
     width: 250px;
@@ -383,14 +486,17 @@ export default {
     }
 
     .long:hover {
-      animation: slide 10s linear infinite;
+      animation: slide 6s linear infinite;
     }
 
     .name {
       display: inline-block;
       color: #4c4c4c;
-      //width: 100px;
       white-space: nowrap;
+      padding-left: 5px;
+      a{
+        display: inline-block;
+      }
     }
 
     .alia {
@@ -500,13 +606,10 @@ export default {
   }
   @keyframes slide {
     0% {
-      transform: translateX(0);
-    }
-    50% {
-      transform: translateX(-50%);
+      transform: translateX(0%);
     }
     100% {
-      transform: translateX(-100%);
+      transform: translateX(-50%);
     }
   }
   .playlist-enter-active{

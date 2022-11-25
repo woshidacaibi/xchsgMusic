@@ -563,7 +563,8 @@ export default {
                 this.$store.state.likesongids.push(id)
                 const res = await this.$http.get('/song/detail', {
                   params: {
-                    ids: id
+                    ids: id,
+                    cookie: localStorage.getItem('cookie')
                   }
                 })
                 this.$store.state.mylikeList.tracks.unshift(res.data.songs[0])
@@ -597,7 +598,8 @@ export default {
             this.$store.state.likesongids.push(id)
             const res = await this.$http.get('/song/detail', {
               params: {
-                ids: id
+                ids: id,
+                cookie: localStorage.getItem('cookie')
               }
             })
             this.$store.state.mylikeList.tracks.unshift(res.data.songs[0])
@@ -648,7 +650,8 @@ export default {
       this.$http.get('/song/url/v1', {
         params: {
           id: id,
-          level: 'exhigh'
+          level: 'exhigh',
+          cookie: localStorage.getItem('cookie')
         }
       }).then((res) => {
         if (!res.data.data[0].url) {

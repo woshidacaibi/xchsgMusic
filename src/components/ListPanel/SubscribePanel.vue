@@ -53,7 +53,8 @@ export default {
           params: {
             id: this.playlistId,
             limit: 60,
-            offset: (page - 1) * 60
+            offset: (page - 1) * 60,
+            cookie: localStorage.getItem('cookie')
           }
         }).then((res) => {
         this.currentSubscribers = res.data.subscribers

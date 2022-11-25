@@ -47,7 +47,7 @@ export default {
   },
   methods: {
     async getEverydayData () {
-      const newSongList = await this.$http.get('/personalized/newsong?limit=12')
+      const newSongList = await this.$http.get('/personalized/newsong?limit=12', { params: { cookie: localStorage.getItem('cookie') } })
       // this.newSongList = [...newSongList.data.result]
       this.isload = true
       newSongList.data.result.forEach(val => {

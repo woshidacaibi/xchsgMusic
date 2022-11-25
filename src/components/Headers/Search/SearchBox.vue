@@ -81,7 +81,8 @@ export default {
         this.timer = setTimeout(async () => {
           const res = await this.$http.get('/search/suggest', {
             params: {
-              keywords: this.keyword
+              keywords: this.keyword,
+              cookie: localStorage.getItem('cookie')
             }
           })
           this.searchList = { ...res.data.result }

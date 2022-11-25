@@ -158,7 +158,8 @@ export default {
         params: {
           uid: this.uid,
           limit: 100,
-          offset: this.offset
+          offset: this.offset,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.offset += 100
@@ -172,7 +173,8 @@ export default {
         params: {
           uid: this.uid,
           limit: 100,
-          offset: this.offset
+          offset: this.offset,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.offset += 100

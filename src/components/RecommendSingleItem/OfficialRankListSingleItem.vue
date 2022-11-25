@@ -37,7 +37,8 @@ export default {
         params: {
           id: this.PlaylistInfo.id,
           limit: 5,
-          offset: 0
+          offset: 0,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.partTracks = [...res.data.songs]

@@ -26,7 +26,8 @@ export default {
     async getSingerDesc () {
       const res = await this.$http.get('/artist/desc', {
         params: {
-          id: this.singerId
+          id: this.singerId,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.descInfo = { ...res.data }

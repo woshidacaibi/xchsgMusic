@@ -127,7 +127,7 @@ export default {
   flex-shrink: 0;
   position: fixed;
   left: 0;
-  bottom: 0;
+  top: 630px;
   width: 100%;
 }
 .wrapper{

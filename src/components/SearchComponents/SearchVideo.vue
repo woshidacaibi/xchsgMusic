@@ -46,7 +46,8 @@ export default {
           keywords: this.keyword,
           type: 1014,
           limit: this.limit,
-          offset: (this.currentPage - 1) * this.limit === 300 ? 299 : (this.currentPage - 1) * this.limit
+          offset: (this.currentPage - 1) * this.limit === 300 ? 299 : (this.currentPage - 1) * this.limit,
+          cookie: localStorage.getItem('cookie')
         }
       })
       if (res.data.result.videoCount > 0) { this.videosInfo = [...res.data.result.videos] } else {

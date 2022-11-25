@@ -63,7 +63,11 @@ export default {
   },
   methods: {
     async getTags () {
-      const res = await this.$http.get('/video/group/list')
+      const res = await this.$http.get('/video/group/list', {
+        params: {
+          cookie: localStorage.getItem('cookie')
+        }
+      })
       this.tags = [...res.data.data]
       this.isload = true
     },

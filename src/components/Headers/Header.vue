@@ -71,7 +71,11 @@ export default {
     // 热搜操作
     async getHotSearch () {
       if (this.hotList.length === 0) {
-        const result = await this.$http.get('/search/hot/detail')
+        const result = await this.$http.get('/search/hot/detail', {
+          params: {
+            cookie: localStorage.getItem('cookie')
+          }
+        })
         this.hotList = result.data.data
       }
     },

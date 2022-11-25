@@ -37,7 +37,8 @@ export default {
     pushsongs () {
       this.$http.get('/album', {
         params: {
-          id: this.albumInfo.id
+          id: this.albumInfo.id,
+          cookie: localStorage.getItem('cookie')
         }
       }).then(res => {
         const songs = res.data.songs

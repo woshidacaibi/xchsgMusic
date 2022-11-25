@@ -20,6 +20,7 @@ import MySubscribePanel from '@/views/MainWindow/MySubscribePanel'
 import SubscribeAlbum from '@/components/MySubscribeComponents/SubscribeAlbum'
 import SubscribeArtists from '@/components/MySubscribeComponents/SubscribeArtists'
 import SubscribeVideos from '@/components/MySubscribeComponents/SubscribeVideos'
+import axios from 'axios'
 Vue.use(VueRouter)
 const routes = [
   { path: '', redirect: '/MainIndex' },
@@ -143,6 +144,12 @@ const router = new VueRouter({
   routes
 })
 router.beforeEach((to, from, next) => {
+  if (!localStorage.getItem('cookie')) {
+    router.app.$options.store.state.islogin = false
+    axios.get('/register/anonimous', { params: { timestamp: Date.now() } }).then(res => {
+      localStorage.setItem('cookie', res.data.cookie)
+    })
+  }
   if (to.meta.single === true) {
     router.app.$options.store.state.hasAsideAndPlayer = false
   } else router.app.$options.store.state.hasAsideAndPlayer = true

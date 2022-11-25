@@ -30,6 +30,7 @@
       <div class="singer-body">
         <RecommendSinger :singers="artists"></RecommendSinger>
       </div>
+      <div v-if="isBottom" style="text-align: center">没有更多了。。。</div>
     </template>
     <Loading v-if="!isload" :isload="isload" :cover-name="'artists-recommend-panel'"></Loading>
   </div>
@@ -45,7 +46,7 @@ export default {
     return {
       artists: [],
       isload: false,
-      limit: 30,
+      limit: 10,
       offset: 0,
       isBottom: false,
       timer: null,
@@ -76,7 +77,9 @@ export default {
           offset: this.offset,
           type: this.currentTypeId,
           area: this.currentAreaId,
-          initial: this.currentInitial
+          initial: this.currentInitial,
+          cookie: localStorage.getItem('cookie'),
+          timestamp: Date.now()
         }
       })
       this.offset += this.limit
@@ -93,9 +96,9 @@ export default {
         if (this.view_panel.clientHeight + this.view_panel.scrollTop + 60 >= this.view_panel.scrollHeight) {
           this.getRecommendArtists()
         }
-        this.timer = null
         this.timer = setTimeout(() => {
-        }, 1000)
+          this.timer = null
+        }, 10)
       }
     }
   },
@@ -136,6 +139,7 @@ export default {
   mounted () {
     const dc = document.getElementsByClassName('__panel')
     this.view_panel = dc[2]
+    dc[2].scrollTop = 0
     this.view_panel.addEventListener('scroll', this.bottomLoad)
   },
   destroyed () {

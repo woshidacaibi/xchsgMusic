@@ -44,7 +44,6 @@ export default {
     }
   },
   created () {
-    // console.log(this.comment)
   },
   methods: {
     timeFormat (timer) {

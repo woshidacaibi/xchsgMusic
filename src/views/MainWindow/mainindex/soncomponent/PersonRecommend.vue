@@ -59,7 +59,11 @@ export default {
   },
   methods: {
     async getEverydayData () {
-      await this.$http.get('/banner').then(res => {
+      await this.$http.get('/banner', {
+        params: {
+          cookie: localStorage.getItem('cookie')
+        }
+      }).then(res => {
         this.banners = [...res.data.banners]
       })
       this.isload = true
@@ -70,6 +74,8 @@ export default {
     this.getEverydayData()
   },
   mounted () {
+    const dc = document.getElementsByClassName('__panel')
+    dc[2].scrollTop = 0
     document.getElementsByClassName(' show-button')[0].addEventListener('click', () => {
       if (!this.timer) {
         this.timer = setTimeout(() => {

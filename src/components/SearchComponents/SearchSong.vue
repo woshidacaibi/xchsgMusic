@@ -47,7 +47,8 @@ export default {
           keywords: this.keyword,
           type: 1,
           limit: 100,
-          offset: (this.currentPage - 1) * this.limit
+          offset: (this.currentPage - 1) * this.limit,
+          cookie: localStorage.getItem('cookie')
         }
       })
       if (res.data.result.songCount !== 0) {

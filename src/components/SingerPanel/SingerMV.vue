@@ -33,7 +33,8 @@ export default {
         params: {
           id: this.singerId,
           limit: this.limit,
-          offset: this.offset
+          offset: this.offset,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.mvsInfo.push(...res.data.mvs)

@@ -38,7 +38,6 @@ export default {
         hasmore = res1.data.hasMore
         this.MySubscribeAlbums.push(...res1.data.data)
       }
-      console.log(this.MySubscribeAlbums)
       this.isload = true
     }
   },

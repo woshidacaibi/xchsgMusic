@@ -79,7 +79,7 @@ export default {
         })
         return
       }
-      this.$http.get('/captcha/sent', { params: { phone: this.phone } }).then((res) => {
+      this.$http.get('/captcha/sent', { params: { phone: this.phone, cookie: localStorage.getItem('cookie') } }).then((res) => {
         if (res.status === 200) {
           this.status = 1
           this.internal = 60
@@ -93,8 +93,8 @@ export default {
         } else {
           this.internal = res.data.message
         }
-      }, (err) => {
-        console.log(err.message)
+      }).catch(() => {
+        this.$message({ message: '发送失败请稍后重试', type: 'error' })
       })
     },
     // 登录验证（手机+ 验证码）
@@ -108,7 +108,7 @@ export default {
         })
         return
       }
-      this.$http.get('/login/cellphone', { params: { phone: this.phone, captcha: this.captcha } }).then((result) => {
+      this.$http.get('/login/cellphone', { params: { phone: this.phone, captcha: this.captcha, cookie: localStorage.getItem('cookie') } }).then((result) => {
         if (result.status === 200) {
           this.$store.state.logining = false
           this.$store.state.userId = result.data.id
@@ -116,15 +116,18 @@ export default {
           this.$store.state.islogin = true
           location.reload()
         }
-      }, (err) => {
+      }, () => {
         this.$message({ message: '验证码错误', type: 'error' })
-        console.log(err)
       })
     },
     async getKey () {
       await this.$http.get('/login/qr/key').then(res => {
         this.key = res.data.data.unikey
-        this.$http.get(`/login/qr/create?key=${this.key}&qrimg=base64&timestamp=${Date.now()}`).then(res => {
+        this.$http.get(`/login/qr/create?key=${this.key}&qrimg=base64&timestamp=${Date.now()}`, {
+          params: {
+            cookie: localStorage.getItem('cookie')
+          }
+        }).then(res => {
           this.keyImg = res.data.data.qrimg
           this.isQRLoad = true
           if (this.keyTimer === null) {
@@ -133,12 +136,16 @@ export default {
             }, 1500)
           }
         })
-      }).catch(err => {
-        console.log(err)
+      }).catch(() => {
+        this.$message({ message: '获取二维码失败', type: 'error' })
       })
     },
     async keyCheck () {
-      const res = await this.$http.get(`/login/qr/check?key=${this.key}&timestamp=${Date.now()}`)
+      const res = await this.$http.get(`/login/qr/check?key=${this.key}&timestamp=${Date.now()}`, {
+        params: {
+          cookie: localStorage.getItem('cookie')
+        }
+      })
       this.keyStatus = res.data.code
       this.keyTips = res.data.message
       if (res.data.code === 803) {

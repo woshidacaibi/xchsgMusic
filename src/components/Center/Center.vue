@@ -95,7 +95,7 @@ export default {
       if (!this.$store.state.islogin) {
         return
       }
-      const result = await this.$http.get('/user/playlist', { params: { uid: this.$store.state.userInfo.userId, limit: 1000, timestamp: Date.now() } })
+      const result = await this.$http.get('/user/playlist', { params: { uid: this.$store.state.userInfo.userId, limit: 1000, timestamp: Date.now(), cookie: localStorage.getItem('cookie') } })
       this.$store.state.mylikeListid = result.data.playlist[0].id
       await this.getMylikeList()
       for (let i = 0; i < result.data.playlist.length; i++) {

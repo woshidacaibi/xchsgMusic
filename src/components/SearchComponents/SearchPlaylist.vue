@@ -45,14 +45,14 @@ export default {
           keywords: this.keyword,
           type: 1000,
           limit: this.limit,
-          offset: (this.currentPage - 1) * this.limit === 300 ? 299 : (this.currentPage - 1) * this.limit
+          offset: (this.currentPage - 1) * this.limit === 300 ? 299 : (this.currentPage - 1) * this.limit,
+          cookie: localStorage.getItem('cookie')
         }
       })
       if (res.data.result.playlistCount > 0) { this.playlistInfo = [...res.data.result.playlists] } else {
         this.playlistInfo = {}
       }
       this.playlistNum = res.data.result.playlistCount >= 300 ? 300 : res.data.result.playlistCount
-      console.log(res.data.result.playlistCount, this.playlistNum)
       this.$emit('passSearchCount', '找到' + this.playlistNum + '个歌单')
       this.isload = true
       this.toTop()

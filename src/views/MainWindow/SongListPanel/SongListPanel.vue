@@ -24,7 +24,7 @@
               <button v-else class="collection" @click="subscribe"><i class="iconfont icon-shoucang"></i>收藏({{collectionNum }})</button>
             </div>
             <div class="count-message"><span>歌曲：{{playlistInfo.trackCount}}</span><span>播放：{{playNum}}</span></div>
-            <div v-if="playlistInfo.description" style="width: 400px;font-size: 13px;margin-top:20px ;color:#9f9f9f">简介：{{playlistInfo.description}}</div>
+            <div v-if="playlistInfo.description" class="desc" :title="playlistInfo.description">简介：{{playlistInfo.description}}</div>
           </div>
         </div>
         <div class="playlist-body">
@@ -136,6 +136,13 @@ export default {
     // 根据歌单id 将表单歌曲放到播放列表中
     updateSonglist () {
       // 加入播放清单
+      if (!this.islistload) {
+        this.$message({
+          message: '请歌单歌曲加载后再试',
+          type: 'warning'
+        })
+        return
+      }
       this.$store.commit('UPDATESONGLIST', this.playlistInfo.tracks)
     },
     async getlistDetail () {
@@ -166,7 +173,8 @@ export default {
               id: this.playlistInfo.id,
               limit: 1000,
               offset: offset,
-              timestamp: Date.now()
+              timestamp: Date.now(),
+              cookie: localStorage.getItem('cookie')
             }
           })
           songs.push(...res.data.songs)
@@ -327,7 +335,7 @@ export default {
   margin: 0 25px 0 0;
 }
 .playlist-header {
-  height: 400px;
+  height: 300px;
   width: 750px;
 
   .left {
@@ -431,7 +439,6 @@ export default {
       width: 120px;
     }
   }
-
   .count-message{
     margin-top: 10px;
     span{
@@ -448,6 +455,20 @@ export default {
       margin-left: 30px;
     }
   }
+}
+.desc{
+  width: 400px;
+  font-size: 13px;
+  margin-top:20px ;
+  color:#9f9f9f;
+  height: 85px;
+  display: -webkit-box;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  -webkit-line-clamp: 5;
+  word-break: break-all;  // 注意这个文字多行很重要
+  -webkit-box-orient: vertical;
+  vertical-align: middle;
 }
 .el-input-box{
   width: 200px;

@@ -42,7 +42,7 @@ export default {
   props: ['hotList'],
   data () {
     return {
-      historySearch: JSON.parse(localStorage.getItem('historySearch'))
+      historySearch: JSON.parse(localStorage.getItem('historySearch')) ? JSON.parse(localStorage.getItem('historySearch')) : []
     }
   },
   methods: {

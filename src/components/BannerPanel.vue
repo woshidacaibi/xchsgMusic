@@ -50,7 +50,13 @@ export default {
   },
   methods: {
     playsong (id) {
-      this.$http.get('/song/detail', { params: { ids: id } }).then(res => {
+      this.$http.get('/song/detail', {
+        params:
+          {
+            ids: id,
+            cookie: localStorage.getItem('cookie')
+          }
+      }).then(res => {
         this.$store.dispatch('pushsongtolist', res.data.songs[0])
       })
     },

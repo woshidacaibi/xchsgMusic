@@ -46,10 +46,10 @@
                 已点赞({{otherInfo.likedCount}})</el-button>
               <el-button round v-if="!isSub" @click="subVideo(1,'mv')" size="small">
                 <i class="iconfont icon-shoucang"></i>
-                收藏({{videoPlayMessage.subscribeCount}})</el-button>
+                收藏({{videoPlayMessage.subCount}})</el-button>
               <el-button round v-if="isSub" @click="subVideo(2,'mv')" size="small">
                 <i class="iconfont icon-yishoucang" style="color: #ec4141"></i>
-                已收藏({{videoPlayMessage.subscribeCount}})</el-button>
+                已收藏({{videoPlayMessage.subCount}})</el-button>
               <el-button round size="small" @click="download"><i class="iconfont icon-xiazai"></i>下载</el-button>
             </div>
             <CommentList :cid="videoId"
@@ -150,7 +150,8 @@ export default {
     async getMvMessage () {
       const res1 = await this.$http.get('/mv/url', {
         params: {
-          id: this.videoId
+          id: this.videoId,
+          cookie: localStorage.getItem('cookie')
         }
       })
       this.videoUrl = res1.data.data.url
@@ -191,10 +192,10 @@ export default {
     },
     async getVideoMessage () {
       const res1 = await this.$http.get('/video/url', {
-        params: { id: this.videoId }
+        params: { id: this.videoId, cookie: localStorage.getItem('cookie') }
       })
       this.videoUrl = res1.data.urls[0].url
-      const res2 = await this.$http.get('/video/detail', { params: { id: this.videoId, timestamp: Date.now() } })
+      const res2 = await this.$http.get('/video/detail', { params: { id: this.videoId, timestamp: Date.now(), cookie: localStorage.getItem('cookie') } })
       this.videoPlayMessage = { ...res2.data.data }
       await this.getSimiVideo()
       let hasmore = true

@@ -60,6 +60,10 @@ export default {
     typeChange (typeName) {
       this.currentPanel = typeName
     }
+  },
+  mounted () {
+    const dc = document.getElementsByClassName('__panel')
+    dc[2].scrollTop = 0
   }
 }
 </script>

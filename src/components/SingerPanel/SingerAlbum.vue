@@ -63,15 +63,14 @@ export default {
   },
   methods: {
     async getSingerAlbums () {
-      console.log(7)
       const res = await this.$http.get('/artist/album', {
         params: {
           id: this.singerId,
           offset: this.offset,
-          limit: this.limit
+          limit: this.limit,
+          cookie: localStorage.getItem('cookie')
         }
       })
-      console.log(res)
       this.albums.push(...res.data.hotAlbums)
       this.offset += this.limit
       this.isButtom = !res.data.more
@@ -84,7 +83,8 @@ export default {
           year: this.year,
           month: this.month,
           area: this.areaId,
-          limit: 30
+          limit: 30,
+          cookie: localStorage.getItem('cookie')
         }
       })
       if (res.data.weekData) {

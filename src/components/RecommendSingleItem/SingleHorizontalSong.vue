@@ -40,10 +40,10 @@ export default {
     playSong () {
       this.$http.get('song/detail', {
         params: {
-          ids: this.songMessage.id
+          ids: this.songMessage.id,
+          cookie: localStorage.getItem('cookie')
         }
       }).then(res => {
-        console.log('plat it')
         this.$store.dispatch('pushsongtolist', res.data.songs[0])
       })
     }
