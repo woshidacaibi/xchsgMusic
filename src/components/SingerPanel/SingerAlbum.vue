@@ -22,7 +22,7 @@
       </div>
       <Loading :cover-name="'SingerAlbum'" :isload="!isButtom"></Loading>
     </template>
-    <Loading :cover-name="'SingerAlbum'" text="专辑加载较慢，见谅" :isload="isload"></Loading>
+    <Loading :cover-name="'SingerAlbum'" text="专辑加载较慢。。。" :isload="isload"></Loading>
   </div>
 </template>
 
@@ -51,14 +51,22 @@ export default {
   },
   watch: {
     areaId () {
-      this.isButtom = false
-      this.isload = false
-      this.month = new Date().getMonth() + 1
-      this.year = new Date().getFullYear()
-      this.eachMonthAlbums = []
-      this.weekData = []
-      if (this.areaId !== 'ALL') { this.currentArea = this.year + '年' + this.month + '月' } else { this.currentArea = '本周新碟' }
-      this.getNewAlbums()
+      const loadTimer = setInterval(() => {
+        this.eachMonthAlbums = []
+        this.weekData = []
+        if (!this.timer) {
+          console.log('')
+          this.isButtom = false
+          this.isload = false
+          this.month = new Date().getMonth() + 1
+          this.year = new Date().getFullYear()
+          this.eachMonthAlbums = []
+          this.weekData = []
+          if (this.areaId !== 'ALL') { this.currentArea = this.year + '年' + this.month + '月' } else { this.currentArea = '本周新碟' }
+          this.getNewAlbums()
+          clearInterval(loadTimer)
+        }
+      }, 500)
     }
   },
   methods: {
@@ -74,6 +82,7 @@ export default {
       this.albums.push(...res.data.hotAlbums)
       this.offset += this.limit
       this.isButtom = !res.data.more
+      this.timer = null
       this.isload = true
     },
     async getNewAlbums () {
@@ -103,10 +112,10 @@ export default {
       if (this.type === 'newAlbum') {
         if (this.timer === null && !this.isButtom) {
           if (this.view_panel.clientHeight + this.view_panel.scrollTop + 30 >= this.view_panel.scrollHeight) {
-            this.timer = setTimeout(() => {
+            this.timer = setTimeout(async () => {
               const temp = this.eachMonthAlbums[this.eachMonthAlbums.length - 1]
               if (temp.lazy >= temp.length) {
-                this.getNewAlbums()
+                await this.getNewAlbums()
               } else {
                 this.currentArea = this.year + '年' + (this.month + 1) + '月'
                 this.eachMonthAlbums[this.eachMonthAlbums.length - 1].lazy += this.limit
@@ -127,7 +136,7 @@ export default {
               this.getSingerAlbums()
             }
             this.timer = null
-          }, 500)
+          }, 20)
         }
       }
     },

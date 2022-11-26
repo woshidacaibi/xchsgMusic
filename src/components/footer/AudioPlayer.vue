@@ -175,12 +175,6 @@ export default {
         // 释放内存
         clipboard.destroy()
       })
-      // const copyContent = document.createElement('input') // 创建一个隐藏input（重要！）
-      // copyContent.value = '123456' // 拼接多个赋值
-      // document.querySelector('.el-message-box').appendChild(copyContent)
-      // copyContent.select() // 选择对象
-      // document.execCommand('Copy') // 执行浏览器复制命令
-      // this.$message.success('复制成功！')
     },
     // 通过currentID 获得url
     async getMusicByid () {
@@ -285,15 +279,15 @@ export default {
     async getCurrent () {
       if (this.playingMusicUrl === '') { return }
       if (this.timerDuration === null) {
+        if (this.playingMusicUrl === '') { return }
+        this.currentTime = this.$refs.player.currentTime
+        // 当前播放时长
+        this.nowTime = this.timeFormat(this.currentTime)
+        // 当前播放进度百分比
+        this.currentPercent = Math.floor(this.currentTime / this.currentDuration * 100)
+        // 如果当前处于播放状态且播放完毕 则跳转到下一首
+        if (this.songStatus && this.currentTime >= this.currentDuration) { this.next() }
         this.timerDuration = setTimeout(() => {
-          if (this.playingMusicUrl === '') { return }
-          this.currentTime = this.$refs.player.currentTime
-          // 当前播放时长
-          this.nowTime = this.timeFormat(this.currentTime)
-          // 当前播放进度百分比
-          this.currentPercent = Math.floor(this.currentTime / this.currentDuration * 100)
-          // 如果当前处于播放状态且播放完毕 则跳转到下一首
-          if (this.songStatus && this.currentTime >= this.currentDuration) { this.next() }
           this.timerDuration = null
         }, 100)
       }
@@ -393,17 +387,6 @@ export default {
       return this.$store.state.hasAsideAndPlayer
     }
   },
-  // 这里由于与aside同级所以存在同级组件渲染竞争问题，
-  // 容易出现aside的数据请求还未保存到vuex中时当前组件已经加载完成，
-  // 从而当前组件无法正确读取，所以我先设定里预先默认的数据，
-  // 然后在vuex中playlist完成获取前重复设置20ms延时器，等到获取到数据
-  // 就可以将获取的数据放到模板即可，当然也可以将播放记录保存到本地，这样就
-  // 避免了竞争问题了
-  // 10/31 优化 新方法设置监听器监听this.$store.state.islogin，当主页调用的异步函数结束时
-  // 即刻调用aside组件中获取表单的方法，即会立刻更新vuex中的数据，进而
-  // 因为中间会设置currentMusic
-  // 所以可以直接返回currentMusic了，就不用设置wait了，但是要解决未登录时面板播放什么的问题
-  // 所以在Aside中如果没登陆就获取热门歌单
   mounted () {
     this.getMusicByid()
     this.$refs.player.volume = 0.1

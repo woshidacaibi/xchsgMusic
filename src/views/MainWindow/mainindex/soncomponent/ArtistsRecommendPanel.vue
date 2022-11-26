@@ -71,6 +71,7 @@ export default {
   },
   methods: {
     async getRecommendArtists () {
+      this.timer = 1547
       const res = await this.$http.get('/artist/list', {
         params: {
           limit: this.limit,
@@ -85,6 +86,7 @@ export default {
       this.offset += this.limit
       this.isBottom = !res.data.more
       this.artists.push(...res.data.artists)
+      this.timer = null
       this.isload = true
     },
     bottomLoad () {
@@ -96,9 +98,6 @@ export default {
         if (this.view_panel.clientHeight + this.view_panel.scrollTop + 60 >= this.view_panel.scrollHeight) {
           this.getRecommendArtists()
         }
-        this.timer = setTimeout(() => {
-          this.timer = null
-        }, 10)
       }
     }
   },
@@ -134,6 +133,7 @@ export default {
     }
   },
   created () {
+    this.artists = []
     this.getRecommendArtists()
   },
   mounted () {

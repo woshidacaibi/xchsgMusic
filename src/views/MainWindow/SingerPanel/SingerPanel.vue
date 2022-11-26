@@ -78,6 +78,11 @@ export default {
           id: this.singerId,
           cookie: localStorage.getItem('cookie')
         }
+      }).catch(() => {
+        this.$message({
+          message: '网络拥挤，稍后再试（估计游客身份又寄了,快登录吧）',
+          type: 'warning'
+        })
       })
       this.singerInfo = { ...res.data.data }
       const sub = await this.$http.get('/artist/sublist', {
@@ -175,6 +180,9 @@ export default {
     if (!this.isload) {
       this.loading()
     }
+  },
+  beforeDestroy () {
+    this.load.close()
   }
 }
 </script>

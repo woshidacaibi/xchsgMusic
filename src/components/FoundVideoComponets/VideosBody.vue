@@ -59,6 +59,7 @@ export default {
   methods: {
     async getVideosInfo () {
       let res
+      this.timer = '1473'
       if (this.tagId === -1) {
         res = await this.$http.get('/video/timeline/all', {
           params: {
@@ -82,9 +83,11 @@ export default {
         if (val.data.coverUrl) { this.videosInfo.push(val.data) }
       })
       this.offset += res.data.datas.length
+      this.timer = null
       this.isload = true
     },
     async getMvsInfo () {
+      this.timer = '1473'
       const res = await this.$http.get('/mv/all', {
         params: {
           area: this.tags.area,
@@ -99,6 +102,7 @@ export default {
         this.isBottom = true
       }
       this.videosInfo.push(...res.data.data)
+      this.timer = null
       this.isload = true
     },
     bottomLoad () {
@@ -115,9 +119,9 @@ export default {
             this.getMvsInfo()
           }
         }
-        this.timer = setTimeout(() => {
-          this.timer = null
-        }, 10)
+        // this.timer = setTimeout(() => {
+        //   this.timer = null
+        // }, 10)
       }
     }
   },

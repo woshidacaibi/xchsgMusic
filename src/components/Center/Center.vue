@@ -203,7 +203,7 @@ export default {
       font-size: 20px;
       left: -5px;
       top: 300px;
-      z-index: 30;
+      z-index: 1;
       animation: fadeIn 0.5s;
     }
     .hide-button{
@@ -214,7 +214,7 @@ export default {
       font-size: 20px;
       left: 190px;
       top: 300px;
-      z-index: 20;
+      z-index: 1;
       animation: fadeIn 0.5s;
     }
   }
