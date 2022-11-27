@@ -97,6 +97,9 @@ export default {
         width: 35px;
         border-radius: 50%;
       }
+      a{
+        background-color: transparent;
+      }
     }
     .right{
       clear: both;

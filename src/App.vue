@@ -103,6 +103,7 @@ export default {
   flex-direction: column;
   min-width: 740px;
   min-height: 400px;
+  overflow-y: hidden;
 }
 
 .header {

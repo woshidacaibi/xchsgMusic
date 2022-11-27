@@ -11,7 +11,7 @@
               <h2>{{ playlistInfo.name }}</h2>
             </div>
             <div class="create-message">
-              <router-link style="float:left; padding-right: 10px" to="/">
+              <router-link style="float:left; padding-right: 10px" :to="{path:'/UserPanel',query:{UserId:playlistInfo.creator.userId}}">
                 <img :src="playlistInfo.creator.avatarUrl" class="userImg">
                 <span class="creator-name">{{ playlistInfo.creator.nickname }}</span>
               </router-link>

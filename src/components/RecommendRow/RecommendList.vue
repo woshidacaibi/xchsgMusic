@@ -24,6 +24,7 @@
         <div class="small simpleItem" :key="item.id" v-for="item in recolist.slice(currentPage*8-8,currentPage*8)">
           <PlayListSingleItem :playlist-info="item" :type="'common'"></PlayListSingleItem>
         </div>
+        <div v-if="recolist.slice(currentPage*8-8,currentPage*8).length === 0" style="height: 60px;line-height: 60px;text-align: center">没有更多了。。。</div>
         <el-pagination
           :page-size="8"
           :pager-count="7"
@@ -40,6 +41,7 @@
         <div class="small simpleItem" :key="item.id" v-for="item in recolist.slice(currentPage*8-8,currentPage*8)">
           <PlayListSingleItem :playlist-info="item" :type="'common'"></PlayListSingleItem>
         </div>
+        <div v-if="recolist.slice(currentPage*8-8,currentPage*8).length === 0" style="height: 60px;line-height: 60px;text-align: center">没有更多了。。。</div>
         <el-pagination
           :page-size="8"
           :pager-count="7"

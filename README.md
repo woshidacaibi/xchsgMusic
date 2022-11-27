@@ -1,5 +1,9 @@
 # xchsgmusic
 
+## 关于点开我的网页，我想请求的事情：
+
+**请一定要登录！！！！！！！！，我服务器获得的游客cookie因为我的调试已经被安全检测了，然后打开网页因为游客的身份也有区别所以没法解封，所以很多接口都会失效，所以请一定要登陆，为了你的体验**
+
 ## Project setup
 ```
 npm install
@@ -27,7 +31,7 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 
 ## 在开发项目中我觉得受益匪浅的一些技巧
 
-（欢迎指正，我也不清楚对不对，如果有改良的地方，希望不吝赐教，第一个项目需要改正的点太多了）
+（欢迎指正，我也不清楚对不对，如果有改良的地方，希望不吝赐教，这是我的第一个项目，缺点应该会很多）
 
 ### 1.computed 不要在其中引用高频修改的属性值
 
@@ -166,10 +170,158 @@ mounted () {
 
 ### 8.接口文档一定要仔细阅读
 
+后面学习其他人的相同作品的时候发现有好多都不一样，有太多可以优化的点了，比如我之前没看文档，一直在抱怨更新有缓存两分钟才更一次，后来对比其他人发现他们的怎么直接更新，又回去仔细看了一遍发现要加时间戳解决缓存问题，然后代码改的极其痛苦
+
+重点是之前有一些功能已经针对缓存问题写的，动就要重写，但这时候我的项目所有功能都结束了工程太大，改也改不了，**所以请一定要仔细阅读开头一些部分**
+
 ### 9.大量数据加载问题
 
-### 10.弹性盒子大小
+我之前写歌单面板时懒加载，20，20的加，但发现到800左右量的时候出现严重卡顿，所以长痛不如短痛，**请一次加载好那些大量数据，如果量太大请分页**。加载时尽量不要设置会出现滚动条的高度，因为用户滚动了就会发现卡顿，但是他没法滚动就只有点其他操作才会发现卡顿。
+
+### 10.弹性盒子大小锁定一行几个
+
+其实本质上就是5个width：20%的inline-block，这里我主要是想学习下flex，直接用简单的方法更好
+
+```less
+.row {
+  width: 100%;
+  text-align: center;
+  display: flex;
+  align-content: flex-start;
+  //flex-flow属性是flex-direction属性和flex-wrap属性的简写形式，默认值为row nowrap。
+  
+  flex-flow: row wrap;
+}
+.row-item{
+  // flex-grow，flex-shrink和flex-basis
+  // flex-shrink 为0是不收缩
+  // flex-grow 为0是不扩大
+  // flex-basis 基本初始尺寸
+  // 其实本质上就是5个width：20%的inline-block
+  flex: 0 0 20%;
+}
+```
+
+### 10.5 根据flex变化大小的指定形状盒子
+
+本质上通过before来将盒子撑开，然后用absolute覆盖到上面
+
+**重点实现原理！！！margin padding 赋值为%百分比的时候，是按父元素的width为参照物**
+
+```less
+.playlist-single-container {
+  width: 100%;
+  position: relative;
+  // 这是用来给底部写东西的，不用写的直接注释掉即可
+  margin-bottom: 50px;
+}
+
+.playlist-single-container:before {
+  content: "";
+  padding-top: 100%;
+  display: block;
+}
+```
 
 ### 11.滚动加载在获取数据的过程中记得禁止接着请求数据，否则会添加重复的数据
 
+滚动到底部加载时发现的，如果不禁止，偏移量不变，请求多个相同的数据push到数据中，就会出现重复。
+
+### 12.强烈建议学习：拖动盒子
+
+写歌词的时候学习的，很好用，注意里面别加盒子，里面的盒子也会拖着走
+
+```js
+move (e) {
+  const odiv = e.target // 获取目标元素
+  // 算出鼠标相对元素的位置
+  const disX = e.clientX - odiv.offsetLeft
+  const disY = e.clientY - odiv.offsetTop
+  document.onmousemove = (e) => { // 鼠标按下并移动的事件
+    // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
+    const left = e.clientX - disX
+    const top = e.clientY - disY
+    // 绑定元素位置到positionX和positionY上面
+    // 移动当前元素
+    odiv.style.left = left + 'px'
+    odiv.style.top = top + 'px'
+  }
+  document.onmouseup = (e) => {
+    document.onmousemove = null
+    document.onmouseup = null
+  }
+}
+```
+
+### 13.音频和视频文件下载，点击连接后出现新网页而不是创建下载任务问题
+
+进行blob格式（一种二进制大对象格式）转化
+
+fetch 是一种Promise对象版的XHMLHttpRequest，但是有些浏览器不支持，是为了取代xhr的存在。
+
+fetch()通过数据流（Stream对象）处理数据，可以分块读取，有利于提高网站性能表现，减少内存占用，对于请求大文件或者网速慢的场景相当有用。
+
+本质上是我们先在网易服务器获取URL（会打开网页），
+
+然后用fetch请求这个url，获得blob对象（代表这个音乐文件），
+
+之后使用createObjectURL，在浏览器内部生成一个URL目标是这个音乐文件。
+
+之后a请求就直接请求这个文件，就是等于请求一个文件，就会生成下载任务了
+
+### 注意：函数结束后Blob 本身仍驻留在内存中，浏览器无法释放它，针对这个问题，我们可以调用 `URL.revokeObjectURL(url)` 方法，从内部映射中删除引用，从而允许删除 Blob（如果没有其他引用），并释放内存。
+
+```js
+fetch(目标url).then(res => res.blob()).then(blob => {
+  const a = document.createElement('a')
+  document.body.appendChild(a)
+  a.style.display = 'none'
+  // 使用获取到的blob对象创建的url
+  const url = window.URL.createObjectURL(blob)
+  a.href = url
+  // 指定下载的文件名
+  a.download = name + '.mp3'
+  a.click()
+  document.body.removeChild(a)
+  // 移除blob对象的url
+  window.URL.revokeObjectURL(url)
+})
+```
+
+Blob其实是为了大文件服务的，通过slice方法可以将Blob文件分查，file的本质是特殊的blob文件
+
+**关于流程我可以不可以理解是客户端网页先下载了这个音频，然后我又利用这个音频又创建了一个下载任务**
+
+```js
+Blob {size: 2708837, type: 'audio/mpeg'}
+size: 2708837
+type: "audio/mpeg"
+[[Prototype]]: Blob
+可以看到这里都能看到这个文件的大小，已经是保存到本地了
+生成的url
+blob:http://172.27.245.128:8080/632a4141-3d02-4ad0-9aae-44d93302c210
+再看这个映射，172.27.245.128:8080 是我调试的页面地址，说明是通过本地传输的（不需要额外的流量）
+```
+
+![66955075608](../../%E5%89%8D%E7%AB%AF%E5%AD%A6%E4%B9%A0/xchsgmusic/assets/1669550756081.png)
+
+通过设定时器 我先获取blob 然后等10s在点击a标签 也发现10s未出现下载应有的网速。也可以验证我的想法
+
+### 14.歌词自动滚动
+
+获取每行歌词offsetHeight相加 = 容器的scrollTop，我的思路是这个。
+
+**这里面我认为比较有价值的是滚动的动画，将需要滚动的值拆分为10等份，设定时器每50ms 改一次scrollTop，就可以形成动画效果啦**
+
+### 15.养成catch Error的好习惯
+
+不然看着一片红，真的无从下手
+
 ## 目前尚未解决的问题：
+
+### cookie！！！！！！！！！
+
+这个我发现只有登录我服务器的网页可以自动设置cookie，本地没法设置，而且我设置httponly就不让我添加。
+
+我的方法是document.cookie = '要添加的cookie'，我通过正则表达式拆分返回的cookie，crsf 可以和MUSI_U等其他的需要httponly，但是我不会添加，所以只能localstorage本地存储cookie了。
+

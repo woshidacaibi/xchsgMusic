@@ -12,11 +12,22 @@ export default {
   name: 'PersonalMessage',
   methods: {
     async logout () {
-      localStorage.removeItem('cookie')
-      this.$store.state.islogin = false
-      this.$http.get('/register/anonimous').then(res => {
-        localStorage.setItem('cookie', res.data.cookie)
-        location.reload()
+      this.$confirm('此操作将清空该账号于本网站的各种信息，请确认退出', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        localStorage.clear()
+        this.$store.state.islogin = false
+        this.$http.get('/register/anonimous').then(res => {
+          localStorage.setItem('cookie', res.data.cookie)
+          location.reload()
+          this.$message({
+            type: 'success',
+            message: '注销成功!'
+          })
+        })
+      }).catch(() => {
       })
     }
   }

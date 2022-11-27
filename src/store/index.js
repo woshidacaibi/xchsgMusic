@@ -63,11 +63,17 @@ export default new Vuex.Store({
       alia: [''],
       dt: 0
     },
+    playMethod: localStorage.getItem('playMethod') ? Number(localStorage.getItem('playMethod')) : 0,
     // 主页
     indexNavActiveIndex: '1',
     BannerIndex: 0,
     subArtist: [],
-    historyListMessage: JSON.parse(localStorage.getItem('historyListMessage'))
+    historyListMessage: JSON.parse(localStorage.getItem('historyListMessage')),
+    // 歌曲详情
+    songStatus: false,
+    currentLyrics: '',
+    showSongDetail: false,
+    currentLyricsContent: '暂无歌词'
   },
   mutations: {
     COMMITHISTORY (state, value) {
@@ -83,25 +89,62 @@ export default new Vuex.Store({
       localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
     },
     LASTSONG (state, value) {
-      state.currentIndex--
-      if (state.currentIndex < 0) {
-        state.currentIndex = state.playsongList.length - 1
+      if (value === 1) {
+        state.currentIndex = Math.floor(Math.random() * state.playsongList.length)
+        state.currentMusic = state.playsongList[state.currentIndex]
+        localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
+        localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
+      } else {
+        state.currentIndex--
+        if (state.currentIndex < 0) {
+          state.currentIndex = state.playsongList.length - 1
+        }
+        state.currentMusic = state.playsongList[state.currentIndex]
+        localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
+        localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
       }
-      state.currentMusic = state.playsongList[state.currentIndex]
-      localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
-      localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
     },
     NEXTSONG (state, value) {
-      state.currentIndex++
-      if (state.currentIndex >= state.playsongList.length) {
-        state.currentIndex = 0
+      if (value === 1) {
+        state.currentIndex = Math.floor(Math.random() * state.playsongList.length)
+        state.currentMusic = state.playsongList[state.currentIndex]
+        localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
+        localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
+      } else {
+        state.currentIndex++
+        if (state.currentIndex >= state.playsongList.length) {
+          state.currentIndex = 0
+        }
+        state.currentMusic = state.playsongList[state.currentIndex]
+        localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
+        localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
       }
-      state.currentMusic = state.playsongList[state.currentIndex]
-      localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
-      localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
     },
     // 把得到的表单细节中的歌曲信息添加到播放列表  /playlist/detail?id=871533137
     UPDATESONGLIST (state, value) {
+      if (state.playMethod === 2) {
+        state.playMethod = 0
+      }
+      state.playsongList = []
+      state.currentIndex = 0
+      value.forEach(item => {
+        state.playsongList.push({
+          // id: item.id,
+          // name: item.name,
+          // picmsg: item.al,
+          // artist: item.ar,
+          alia: item.alia ? item.alia : [],
+          // dt: item.dt,
+          ...item
+        })
+      })
+      state.isReadyPlay = true
+      state.currentMusic = state.playsongList[0]
+      localStorage.setItem('historySongList', JSON.stringify(state.playsongList))
+      localStorage.setItem('normalHistoryList', JSON.stringify(state.playsongList))
+      localStorage.setItem('historyListIndex', JSON.stringify(state.currentIndex))
+    },
+    PUSHXINDONGLIST (state, value) {
       state.playsongList = []
       state.currentIndex = 0
       value.forEach(item => {

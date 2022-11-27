@@ -19,7 +19,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -60,7 +60,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -103,7 +103,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index+9].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index+9].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -144,7 +144,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index+9].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index+9].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -255,7 +255,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -297,7 +297,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -341,7 +341,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index+9].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index+9].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -382,7 +382,7 @@
                 <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
                 <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index+9].res"></i>
                 <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index+9].res"></i>
-                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id)"></i>
+                <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
               </el-col>
               <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
                 <div class="left-box elipse">
@@ -515,7 +515,7 @@ export default {
     },
     fitertracks () {
       const filter = this.tracks.filter(val => {
-        return val.noCopyrightRcmd === null
+        return val.noCopyrightRcmd ? val.noCopyrightRcmd === null : true
       })
       return filter
     }
@@ -559,29 +559,18 @@ export default {
                 id, like, cookie: localStorage.getItem('cookie'), timestamp: Date.now()
               }
             }).then(async (res) => {
-              if (like) {
-                this.$store.state.likesongids.push(id)
-                const res = await this.$http.get('/song/detail', {
-                  params: {
-                    ids: id,
-                    cookie: localStorage.getItem('cookie')
-                  }
-                })
-                this.$store.state.mylikeList.tracks.unshift(res.data.songs[0])
-              } else {
-                let index = this.$store.state.likesongids.findIndex(value => {
-                  return value === id
-                })
-                if (index !== -1) { this.$store.state.likesongids.splice(index, 1) }
-                index = this.$store.state.mylikeList.tracks.findIndex(value => {
-                  return value.id === id
-                })
-                if (index !== -1) { this.$store.state.mylikeList.tracks.splice(index, 1) }
-                this.$message({
-                  type: 'success',
-                  message: '取消喜欢成功（悲——）'
-                })
-              }
+              let index = this.$store.state.likesongids.findIndex(value => {
+                return value === id
+              })
+              if (index !== -1) { this.$store.state.likesongids.splice(index, 1) }
+              index = this.$store.state.mylikeList.tracks.findIndex(value => {
+                return value.id === id
+              })
+              if (index !== -1) { this.$store.state.mylikeList.tracks.splice(index, 1) }
+              this.$message({
+                type: 'success',
+                message: '取消喜欢成功（悲——）'
+              })
             })
           }
         })
@@ -593,35 +582,21 @@ export default {
             cookie: localStorage.getItem('cookie'),
             timestamp: Date.now()
           }
-        }).then(async (res) => {
-          if (like) {
-            this.$store.state.likesongids.push(id)
-            const res = await this.$http.get('/song/detail', {
-              params: {
-                ids: id,
-                cookie: localStorage.getItem('cookie')
-              }
-            })
-            this.$store.state.mylikeList.tracks.unshift(res.data.songs[0])
-            this.$message({
-              type: 'success',
-              message: '喜欢成功（喜——）'
-            })
-          } else {
-            let index = this.$store.state.likesongids.findIndex(value => {
-              return value === id
-            })
-            if (index !== -1) {
-              this.$store.state.likesongids.splice(index, 1)
+        }).then(async () => {
+          this.$store.state.likesongids.push(id)
+          const res = await this.$http.get('/song/detail', {
+            params: {
+              ids: id,
+              cookie: localStorage.getItem('cookie')
             }
-            index = this.$store.state.mylikeList.tracks.findIndex(value => {
-              return value.id === id
-            })
-            if (index !== -1) {
-              this.$store.state.mylikeList.tracks.splice(index, 1)
-            }
-          }
-        }).catch(() => {
+          })
+          this.$store.state.mylikeList.tracks.unshift(res.data.songs[0])
+          this.$message({
+            type: 'success',
+            message: '喜欢成功（喜——）'
+          })
+        }
+        ).catch(() => {
           this.$notify.error({
             title: '错误',
             message: '网易云没版权'
@@ -646,7 +621,10 @@ export default {
         }, 200)
       }
     },
-    download (id) {
+    download (id, name) {
+      if (this.$store.state.islogin === false) {
+        this.$message.warning('请登陆后再试')
+      }
       this.$http.get('/song/url/v1', {
         params: {
           id: id,
@@ -660,7 +638,22 @@ export default {
             message: '资源失效或权限不够（悲）'
           })
         } else {
-          open(res.data.data[0].url)
+          fetch(res.data.data[0].url).then(res => res.blob()).then(blob => {
+            const a = document.createElement('a')
+            document.body.appendChild(a)
+            a.style.display = 'none'
+            // 使用获取到的blob对象创建的url
+            console.log(blob)
+            const url = window.URL.createObjectURL(blob)
+            console.log(url)
+            a.href = url
+            // 指定下载的文件名
+            a.download = name
+            a.click()
+            document.body.removeChild(a)
+            // 移除blob对象的url
+            window.URL.revokeObjectURL(url)
+          })
         }
       })
     },
@@ -863,5 +856,8 @@ export default {
   .songlist-lazy-loading{
     width: 100%;
     height: 100px;
+  }
+  .iconfont:hover{
+    color: #ec4141;
   }
 </style>

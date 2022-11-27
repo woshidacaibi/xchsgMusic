@@ -1,9 +1,13 @@
 <template>
-  <div ref="footer" class="player-container">
+  <div ref="footer" @keyup.left="timeReduce" @keyup.right="timeAdd" class="player-container">
     <div class="message-panel">
       <div class="left">
-        <img v-if="currentMusic.al.picUrl!==''" :src="currentMusic.al.picUrl" alt="">
+        <img v-if="currentMusic.al.picUrl!==''" :src="currentMusic.al.picUrl+'?param=100y100'" alt="">
         <img v-else src='@/assets/default_cover.jpg' alt="">
+        <div class="cover" v-show="currentMusic.id !== -1">
+          <i v-show="$store.state.showSongDetail" @click="$store.state.showSongDetail=false" class="iconfont icon-xiangxia"></i>
+          <i v-show="!$store.state.showSongDetail" @click="$store.state.showSongDetail=true" class="iconfont icon-xiangshang"></i>
+        </div>
       </div>
       <div class="right">
         <a class="musicName long" :title="songName" v-if="nameLength>20">
@@ -39,19 +43,36 @@
                        style="margin: 0;padding-right: 2px">{{ item.name }}<b v-if="index<currentMusic.ar.length-1">/</b></router-link>
         </a>
       </div>
+      <div class="like-icon">
+        <i class="iconfont icon-xihuan" @click="likeSong(currentMusic.id,false)" style="color: #ec4141;" v-show="isliked"></i>
+        <i class="iconfont icon-aixin" @click="likeSong(currentMusic.id,true)" v-show="!isliked"></i>
+      </div>
     </div>
     <div class="control-panel">
-      <div class="control-button">
-        <i class="iconfont icon-shangyishou" @click="before" style="font-size: 15px"></i>
-        <i class="iconfont icon-zanting1 isplay" v-show="songStatus" @click="pause"></i>
-        <i class="iconfont icon-bofang1 isplay" v-show="!songStatus" @click="play"></i>
-        <i class="iconfont icon-xiayishou
-" style="font-size: 15px" @click="next"></i>
-      </div>
-      <div class="control-time">
-        <span style="left: -30px;top: -3px">{{ nowTime }}</span>
-        <el-slider :show-tooltip="false" v-model="currentPercent" @change="change"></el-slider>
-        <span style="right: -30px;top: -3px">{{ songTime }}</span>
+      <template v-if="currentMusic.id !== -1">
+        <div class="control-button">
+          <div class="play-method">
+            <el-tooltip class="item" effect="dark" :content="playMethodName" placement="top">
+              <i @click="changeMethod" v-if="playMethod === 0" class="iconfont icon-liebiaoxunhuan"></i>
+              <i @click="changeMethod" v-if="playMethod === 1" class="iconfont icon-suijibofang"></i>
+              <i @click="changeMethod" v-if="playMethod === 2" class="iconfont icon-icon_xindong"></i>
+              <i @click="changeMethod" v-if="playMethod === 3" class="iconfont icon-danquxunhuan"></i>
+            </el-tooltip>
+          </div>
+          <i class="iconfont icon-shangyishou" @click="before" style="font-size: 18px"></i>
+          <i class="iconfont icon-zanting1 isplay" v-show="songStatus" @click="pause"></i>
+          <i class="iconfont icon-bofang1 isplay" v-show="!songStatus" @click="play"></i>
+          <i class="iconfont icon-xiayishou" style="font-size: 18px" @click="next"></i>
+          <i class="iconfont icon-cibiaoquanyi" @click="showLyrics = !showLyrics"></i>
+        </div>
+        <div class="control-time">
+          <span style="left: -30px;top: -3px">{{ nowTime }}</span>
+          <el-slider :show-tooltip="false" v-model="currentPercent" @change="change"></el-slider>
+          <span style="right: -30px;top: -3px">{{ songTime }}</span>
+        </div>
+      </template>
+      <div class="v-else" v-else style="text-align: center;line-height: 60px">
+        请选择播放歌曲
       </div>
     </div>
     <div class="right-panel">
@@ -59,7 +80,7 @@
         <i @click="showList = !showList" class="iconfont icon-gedan1">
         </i>
       </div>
-      <div class="volume-panel" @mouseleave.prevent="$refs['volume-box'].style.display='none'">
+      <div class="volume-panel" @mouseleave="$refs['volume-box'].style.display='none'">
         <i
            @mouseenter.prevent="$refs['volume-box'].style.display='block'"
            v-show="!isMute"
@@ -73,11 +94,14 @@
           class="iconfont icon-shengyinjingyin">
         </i>
         <div ref="volume-box" class="volume-box">
+          <el-tooltip class="item" effect="dark" :content="volume.toString()" placement="right">
           <el-slider class="volume"
                      v-model="volume"
                      @change="mutechange"
                      vertical
+                     :show-tooltip="false"
                      height="100px"/>
+          </el-tooltip>
         </div>
       </div>
     </div>
@@ -88,7 +112,9 @@
         </vue-scroll>
       </div>
     </transition>
-    <audio ref="player" @timeupdate="getCurrent" @canplay="getDuration" hidden :src="playingMusicUrl"></audio>
+    <div v-show="showLyrics && !$store.state.showSongDetail" ref="smallLyrics" class="drag" @mousedown.stop="move">{{$store.state.currentLyricsContent}}
+      <i @click="showLyrics = false" class="iconfont icon-guanbi1"></i></div>
+    <audio id="audio" ref="player" @timeupdate="getCurrent" @canplay="getDuration" hidden :src="playingMusicUrl"></audio>
   </div>
 
 </template>
@@ -111,6 +137,7 @@ export default {
       isMute: false,
       beforeVolume: 0,
       showList: false,
+      showLyrics: false,
       nowTime: '',
       songTime: '',
       songName: '',
@@ -118,7 +145,8 @@ export default {
       timer: null,
       timerDuration: null,
       clientHeight: document.documentElement.clientHeight,
-      messageBoxTimer: null
+      messageBoxTimer: null,
+      normalList: this.$store.state.playsongList
     }
   },
   components: {
@@ -139,14 +167,15 @@ export default {
     },
     // 上一首
     async before () {
-      this.$store.commit('LASTSONG')
+      this.$store.commit('LASTSONG', this.playMethod)
       this.currentMusic = this.$store.state.playsongList[this.currentIndex]
       await this.getMusicByid()
       this.play()
     },
     // 下一首 在这里塞循环播放 随机播放 还有单曲循环
     async next () {
-      this.$store.commit('NEXTSONG')
+      this.$refs.player.loop = false
+      this.$store.commit('NEXTSONG', this.playMethod)
       this.currentMusic = this.$store.state.playsongList[this.currentIndex]
       await this.getMusicByid()
       this.play()
@@ -193,6 +222,12 @@ export default {
       }).catch(err => {
         console.log(err)
       })
+      const res = await this.$http.get(`/lyric?id=${this.$store.state.currentMusic.id}`, {
+        params: {
+          cookie: localStorage.getItem('cookie')
+        }
+      })
+      this.$store.state.currentLyrics = res.data.lrc.lyric
       if (result.data.code === -462 && !this.$store.state.islogin) {
         result = await this.$http.get('/song/url/v1', {
           params: {
@@ -286,10 +321,16 @@ export default {
         // 当前播放进度百分比
         this.currentPercent = Math.floor(this.currentTime / this.currentDuration * 100)
         // 如果当前处于播放状态且播放完毕 则跳转到下一首
-        if (this.songStatus && this.currentTime >= this.currentDuration) { this.next() }
+        if (this.songStatus && this.nowTime === this.songTime) {
+          if (this.playMethod === 3) {
+            this.$refs.player.loop = true
+            return
+          }
+          this.next()
+        }
         this.timerDuration = setTimeout(() => {
           this.timerDuration = null
-        }, 100)
+        }, 10)
       }
     },
     // 修改percent
@@ -307,10 +348,74 @@ export default {
       this.isMute = false
       this.volume = this.beforeVolume
     },
+    likeSong (id, like) {
+      const item = this.currentMusic
+      if (item.noCopyrightRcmd) {
+        this.$notify.error({
+          title: '错误',
+          message: '网易云没版权（悲）'
+        })
+      } else if (!like) {
+        this.$alert('确定将选中歌曲从我喜欢的音乐中删除?', '', {
+          confirmButtonText: '确定',
+          callback: action => {
+            this.$http.get('/like', {
+              params: {
+                id, like, cookie: localStorage.getItem('cookie'), timestamp: Date.now()
+              }
+            }).then(async (res) => {
+              let index = this.$store.state.likesongids.findIndex(value => {
+                return value === id
+              })
+              if (index !== -1) { this.$store.state.likesongids.splice(index, 1) }
+              index = this.$store.state.mylikeList.tracks.findIndex(value => {
+                return value.id === id
+              })
+              if (index !== -1) { this.$store.state.mylikeList.tracks.splice(index, 1) }
+              this.$message({
+                type: 'success',
+                message: '取消喜欢成功（悲——）'
+              })
+            })
+          }
+        })
+      } else {
+        this.$http.get('/like', {
+          params: {
+            id,
+            like,
+            cookie: localStorage.getItem('cookie'),
+            timestamp: Date.now()
+          }
+        }).then(async () => {
+          this.$store.state.likesongids.push(id)
+          const res = await this.$http.get('/song/detail', {
+            params: {
+              ids: id,
+              cookie: localStorage.getItem('cookie')
+            }
+          })
+          this.$store.state.mylikeList.tracks.unshift(res.data.songs[0])
+          this.$message({
+            type: 'success',
+            message: '喜欢成功（喜——）'
+          })
+        }
+        ).catch(() => {
+          this.$notify.error({
+            title: '错误',
+            message: '网易云没版权'
+          })
+        })
+      }
+    },
     mutechange () {
       if (this.isMute && this.volume !== 0) {
         this.isMute = false
       }
+    },
+    changeMethod () {
+      this.$store.state.playMethod = (this.playMethod + 1) % 4
     },
     timeFormat (value) {
       const h = value / 3600 >= 10 ? Math.floor(value / 3600) : '0' + Math.floor(value / 3600)
@@ -320,6 +425,26 @@ export default {
         return m + ':' + s
       } else {
         return h + ':' + m + ':' + s
+      }
+    },
+    // 强烈建议学习
+    move (e) {
+      const odiv = e.target // 获取目标元素
+      // 算出鼠标相对元素的位置
+      const disX = e.clientX - odiv.offsetLeft
+      const disY = e.clientY - odiv.offsetTop
+      document.onmousemove = (e) => { // 鼠标按下并移动的事件
+        // 用鼠标的位置减去鼠标相对元素的位置，得到元素的位置
+        const left = e.clientX - disX
+        const top = e.clientY - disY
+        // 绑定元素位置到positionX和positionY上面
+        // 移动当前元素
+        odiv.style.left = left + 'px'
+        odiv.style.top = top + 'px'
+      }
+      document.onmouseup = (e) => {
+        document.onmousemove = null
+        document.onmouseup = null
       }
     }
   },
@@ -334,9 +459,8 @@ export default {
       // volume-boximmediate: true
     },
     async currentMusic () {
-      this.pause()
+      // this.pause()
       await this.getMusicByid()
-      // const play = this.$refs.player.play()
       // 如果刚打开，不允许播放
       if (!this.isFirstOpen) {
         this.play()
@@ -344,6 +468,42 @@ export default {
     },
     Status (newVal) {
       if (newVal === false) { this.pause() }
+    },
+    songStatus (newVal) {
+      this.$store.state.songStatus = newVal
+    },
+    vuexSongStatus (newVal) {
+      if (newVal) {
+        this.play()
+      } else {
+        this.pause()
+      }
+    },
+    async playMethod (newVal, oldVal) {
+      localStorage.setItem('playMethod', newVal)
+      if (newVal === 2 && !this.$store.state.islogin) {
+        // 如果没登陆就自动跳过登录模式
+        this.$store.state.playMethod++
+      } else if (newVal === 2) {
+        const res = await this.$http.get('/playmode/intelligence/list', {
+          params: {
+            cookie: localStorage.getItem('cookie'),
+            id: this.currentMusic.id,
+            pid: this.$store.state.mylikeListid
+          }
+        })
+        const xindongList = []
+        xindongList.push(this.currentMusic)
+        res.data.data.forEach(val => {
+          xindongList.push(val.songInfo)
+        })
+        localStorage.setItem('normalHistoryList', JSON.stringify(this.$store.state.playsongList))
+        this.$store.commit('PUSHXINDONGLIST', xindongList)
+      } else if (oldVal === 2) {
+        if (localStorage.getItem('normalHistoryList')) {
+          this.$store.commit('UPDATESONGLIST', JSON.parse(localStorage.getItem('normalHistoryList')))
+        }
+      }
     }
   },
   computed: {
@@ -385,7 +545,29 @@ export default {
     },
     Status () {
       return this.$store.state.hasAsideAndPlayer
+    },
+    vuexSongStatus () {
+      return this.$store.state.songStatus
+    },
+    isliked () {
+      return this.$store.state.likesongids.some(val => {
+        return val === this.currentMusic.id
+      })
+    },
+    playMethodName () {
+      switch (this.playMethod) {
+        case 0: return '列表循环'
+        case 1: return '随机播放'
+        case 2: return '心动模式'
+        case 3: return '单曲循环'
+      }
+      return 0
+    },
+    playMethod () {
+      return this.$store.state.playMethod
     }
+  },
+  created () {
   },
   mounted () {
     this.getMusicByid()
@@ -403,9 +585,6 @@ export default {
         this.showList = false
       }
     })
-  },
-  beforeDestroy () {
-    localStorage.setItem('lalalalal', 6)
   }
 }
 </script>
@@ -428,7 +607,7 @@ export default {
     }
   }
   .message-panel {
-    width: 250px;
+    width: 275px;
     height: 65px;
     position: relative;
     overflow: hidden;
@@ -444,7 +623,14 @@ export default {
       flex-shrink: 0;
       overflow: hidden;
     }
-
+    .like-icon{
+      position: absolute;
+      left: 250px;
+      top: 20px;
+      i{
+        font-size: 24px;
+      }
+    }
     .artist {
       float: left;
       margin-top: 30px;
@@ -491,7 +677,7 @@ export default {
     //margin: 0 auto;
     height: 65px;
     padding-left: 40px;
-
+    position: relative;
     .control-button {
       height: 30px;
       line-height: 30px;
@@ -499,7 +685,7 @@ export default {
       text-align: center;
       padding-top: 7px;
       margin: 0 auto;
-
+      position: relative;
       .isplay {
         font-size: 20px;
         border-radius: 50%;
@@ -519,6 +705,21 @@ export default {
       i {
         margin: 0 20px;
       }
+      .play-method{
+        height: 30px;
+        display: inline-block;
+        box-sizing: border-box;
+        i{
+          display: inline-block;
+          height: 30px;
+          font-size: 24px;
+          line-height: 30px;
+        }
+      }
+      .icon-cibiaoquanyi{
+        font-size: 18px;
+        font-weight: bolder;
+      }
     }
 
     .control-time {
@@ -530,7 +731,6 @@ export default {
         position: absolute;
       }
     }
-
     .el-slider {
       height: 20px;
       width: 350px;
@@ -538,13 +738,12 @@ export default {
     }
   }
   .right-panel {
-    width: 200px;
     position: relative;
     z-index: auto;
     flex-shrink: 0;
     i {
       margin: 0 20px;
-      font-size: 30px;
+      font-size: 24px;
       text-align: center;
       line-height: 65px;
       background-color: #fff;
@@ -555,7 +754,6 @@ export default {
       right: 10px;
       z-index: 2005;
     }
-
     .volume-panel{
       float: right;
       position: relative;
@@ -567,7 +765,7 @@ export default {
       position: absolute;
       z-index: 2005;
       top: -105px;
-      left: 15px;
+      left: 10px;
       background-color: navajowhite;
       border: 1px solid rgba(204, 204, 204, 0.47);
       height: 120px;
@@ -580,6 +778,42 @@ export default {
       }
     }
   }
+  .left{
+    position: relative;
+    .cover{
+      //display: none;
+      position: absolute;
+      top: 45%;
+      left: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 9999;
+      width: 0;
+      height: 0;
+      border-radius: 7px;
+      /* 主要内容 */
+      background: transparent;
+      /* 模糊大小就是靠的blur这个函数中的数值大小 */
+      backdrop-filter: blur(2px);
+      i{
+        text-align: center;
+        display: none;
+        color: white;
+        font-weight:lighter;
+      }
+    }
+  }
+  .left:hover{
+    .cover{
+      width: 50px;
+      height: 50px;
+      i{
+        display: inline-block;
+        width: 50px;
+        text-align: center;
+        line-height: 50px;
+      }
+    }
+  }
   .playlist-box{
     position: absolute;
     right: -10px;
@@ -587,6 +821,34 @@ export default {
     box-shadow: -2px 0 5px #9f9f9f;
     background-color: white;
   }
+  .drag{
+    position: absolute;
+    width: 500px;
+    line-height: 50px;
+    left: 50%;
+    top: -60px;
+    background-color: transparent;
+    color: hotpink;
+    font-weight: bolder;
+    font-size: 24px;
+    text-align: center;
+    transition:background-color 1s;
+    user-select: none;
+    i{
+      position: absolute;
+      display: none;
+      right: 5px;
+      top: -12px;
+      color: #3C3C3C;
+    }
+  }
+  .drag:hover{
+    background-color: rgba(255, 235, 205, 0.6);
+    i{
+      display: inline-block;
+    }
+  }
+
   @keyframes slide {
     0% {
       transform: translateX(0%);
@@ -617,6 +879,9 @@ export default {
     100% {
       transform: translateX(0);
     }
+  }
+  .iconfont:hover{
+    color: red;
   }
 }
 </style>

@@ -7,8 +7,7 @@
           <VideoSingleItem v-else-if="type === 'mvs' " :type="'mv'" :videoInfo="item"/>
         </div>
       </div>
-      <div v-if="isBottom">没有更多了</div>
-      <div v-if="offset === 0 && isload">请求过多，被网易云服务器发现了呜呜呜/(ㄒoㄒ)/~~ 左上角选个标签吧</div>
+      <div v-if="isBottom">没有更多了（可能时这个标签没有视频，换个标签试试）</div>
     </template>
     <Loading :isload="isload" cover-name="Video-body" :text="'获取更多视频中'"></Loading>
   </div>

@@ -66,18 +66,27 @@
       <i v-show="isLeftShow" class="iconfont icon-zuojiantou hide-button" @click="isLeftShow=false"></i>
     </div>
     <div class="main-container">
-      <vue-scroll :ops="$store.state.ops" style="width:100%;height:98%">
+      <vue-scroll :ops="$store.state.ops" style="width:100%;height:100%">
         <router-view id="main"></router-view>
       </vue-scroll>
     </div>
+    <transition name="bottom" :appear="true">
+    <div class="song-detail-container" v-show="$store.state.showSongDetail && $store.state.currentMusic.id !== -1">
+      <vue-scroll :ops="$store.state.ops" style="width:100%;height:100%">
+        <SongPanel></SongPanel>
+      </vue-scroll>
+    </div>
+    </transition>
   </div>
 </template>
 
 <script>
+import SongPanel from '@/components/SongPanel/SongPanel'
 export default {
   // eslint-disable-next-line vue/multi-word-component-names
   name: 'Center',
   props: ['islogin'],
+  components: { SongPanel },
   // 这里默认使用了我自己的号id 注意解封后修改下交互式
   data () {
     return {
@@ -181,6 +190,7 @@ export default {
 <style lang="less" scoped>
   .center-container{
     display: flex;
+    position: relative;
     z-index: 0;
   }
   .main-container{
@@ -189,6 +199,15 @@ export default {
     overflow: hidden;
     position: relative;
     z-index: 0;
+    flex: 1;
+  }
+  .song-detail-container{
+    width: 100%;
+    height: 100%;
+    background-color: whitesmoke;
+    overflow: hidden;
+    position: absolute;
+    z-index: 2;
     flex: 1;
   }
   .aside-container{
@@ -267,6 +286,20 @@ export default {
     100% {
       transform: translateX(0);
       opacity: 1;
+    }
+  }
+  .bottom-enter-active{
+    animation: toTop 0.3s linear;
+  }
+  .bottom-leave-active{
+    animation: toTop 0.3s linear reverse;
+  }
+  @keyframes toTop {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0);
     }
   }
 </style>

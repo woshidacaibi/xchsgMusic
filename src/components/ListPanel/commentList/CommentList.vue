@@ -31,7 +31,7 @@
           ></SingleComment>
         </div>
         <div class="new-comments" v-if="currentCommentList && currentCommentList.length>0">
-          <h5 style="font-size: 15px; color: #373737">最近评论({{ count }})</h5>
+          <h5 style="font-size: 15px; color: #373737">最近评论({{ count?count:commentCount }})</h5>
           <SingleComment
             v-for="item in currentCommentList"
             :key="item.commentId"
@@ -46,7 +46,7 @@
           :page-size="limit"
           :pager-count="7"
           layout="prev, pager, next, jumper"
-          :total="count"
+          :total="count?count:commentCount"
           :hide-on-single-page="true"
           class="comment-footer"
           :current-page.sync="currentPage"
@@ -80,6 +80,7 @@ export default {
       commentTip: '请输入内容',
       commentObj: null,
       commentContent: '',
+      commentCount: 0,
       load: {
         close () {
         }
@@ -88,8 +89,16 @@ export default {
   },
   watch: {
     cid () {
-      this.offset = 0
+      this.isload = false
       this.currentPage = 1
+      this.currentCommentList = []
+      this.hotCommentList = []
+      this.offset = 0
+      this.before = ''
+      this.commentTip = '请输入内容'
+      this.commentObj = null
+      this.commentContent = ''
+      this.commentCount = 0
       this.getComments(this.cid, this.limit, this.offset, this.before)
     },
     isload (newVal) {
@@ -123,6 +132,7 @@ export default {
           timestamp: Date.now()
         }
       })
+      this.commentCount = res.data.total
       this.hotCommentList = res.data.hotComments
       this.currentCommentList = res.data.comments
       if (this.currentCommentList && this.currentCommentList.length > 0) {
@@ -222,7 +232,6 @@ export default {
         lock: true,
         text: '加载中，请稍等',
         spinner: 'el-icon-loading',
-        background: 'whitesmoke',
         target: document.querySelector('.comment-cover')
       })
     }
