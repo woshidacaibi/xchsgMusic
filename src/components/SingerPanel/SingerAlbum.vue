@@ -71,7 +71,6 @@ export default {
   },
   methods: {
     async getSingerAlbums () {
-      this.isButtom = true
       const res = await this.$http.get('/artist/album', {
         params: {
           id: this.singerId,
@@ -122,7 +121,7 @@ export default {
                 this.eachMonthAlbums[this.eachMonthAlbums.length - 1].lazy += this.limit
               }
               this.timer = null
-            }, 50)
+            }, 300)
           }
         }
       } else {
