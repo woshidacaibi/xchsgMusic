@@ -458,8 +458,10 @@ export default {
       }
       // volume-boximmediate: true
     },
-    async currentMusic () {
-      // this.pause()
+    async currentMusic (newVal, oldVal) {
+      if (newVal.id !== oldVal.id) {
+        this.pause()
+      }
       await this.getMusicByid()
       // 如果刚打开，不允许播放
       if (!this.isFirstOpen) {
