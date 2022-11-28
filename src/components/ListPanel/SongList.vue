@@ -12,6 +12,7 @@
         </el-row>
         <Loading :isload="islistload" :cover-name="'songlist'" text="歌单内的歌曲较多，请稍等。。。"/>
         <div v-if="isload && islistload" class="songlist-tracks">
+          <div v-show="keyword === ''">
           <div :key="item.id" v-for="(item,index) in c_tracks.slice(0,9)">
             <el-row v-if="item.id === $store.state.currentMusic.id" :gutter="20" class="song">
               <el-col :span="4" class="icon">
@@ -179,6 +180,177 @@
               <el-col :span="6"><router-link :to="{path:'AlbumPanel',query:{albumId: item.al.id}}" class="elipse" style="width: 100%;font-size: 14px">{{item.al.name}}</router-link></el-col>
               <el-col :span="2"><span class="time">{{timeFormat(item.dt/1000)}}</span></el-col>
             </el-row>
+          </div>
+          </div>
+          <div v-if="keyword !== ''">
+            <div :key="item.id" v-for="(item,index) in key_tracks.slice(0,9)">
+              <el-row v-if="item.id === $store.state.currentMusic.id" :gutter="20" class="song">
+                <el-col :span="4" class="icon">
+                  <i class="iconfont icon-laba index" style="color: #ec4141"></i>
+                  <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
+                  <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index].res"></i>
+                  <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index].res"></i>
+                  <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
+                </el-col>
+                <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
+                  <div class="left-box elipse">
+                    <span class="name" >{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col v-else :span="8" class="title nouse">
+                  <div class="left-box elipse">
+                    <span class="name" style="color: #9f9f9f">{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col :span="4" >
+            <span class="elipse" style="width: 100%;font-size: 14px">
+              <span class="artistName" :key="artist.name" v-for="(artist,index) in item.ar.slice(0,5)">
+                <span v-if="artist.id === 0" class="nouse">{{artist.name}}</span>
+                <router-link :to="{name:'SingerPanel',query:{singerId:artist.id}}" v-else>{{artist.name}}</router-link>
+                <span v-if="index<item.ar.length-1" class="nouse"> / </span>
+              </span>
+              <template v-if="item.ar.length>5">...</template>
+            </span>
+                </el-col>
+                <el-col :span="6"><router-link :to="{path:'AlbumPanel',query:{albumId: item.al.id}}" class="elipse" style="width: 100%;font-size: 14px">{{item.al.name}}</router-link></el-col>
+                <el-col :span="2"><span class="time">{{timeFormat(item.dt/1000)}}</span></el-col>
+              </el-row>
+              <el-row v-else :gutter="20" class="song">
+                <el-col :span="4" class="icon">
+                  <span class="index">{{ '0'+(index+1) }}</span>
+                  <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
+                  <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index].res"></i>
+                  <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index].res"></i>
+                  <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
+                </el-col>
+                <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
+                  <div class="left-box elipse">
+                    <span class="name" >{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col v-else :span="8" class="title nouse">
+                  <div class="left-box elipse">
+                    <span class="name" style="color: #9f9f9f">{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col :span="4" >
+                <span class="elipse" style="width: 100%;font-size: 14px">
+                  <span class="artistName" :key="artist.name" v-for="(artist,index) in item.ar.slice(0,5)">
+                    <span v-if="artist.id === 0" class="nouse">{{artist.name}}</span>
+                    <router-link :to="{name:'SingerPanel',query:{singerId:artist.id}}" v-else>{{artist.name}}</router-link>
+                    <span v-if="index<item.ar.length-1" class="nouse">/</span>
+                  </span>
+                  <template v-if="item.ar.length>5">...</template>
+                </span>
+                </el-col>
+                <el-col :span="6"><router-link :to="{path:'AlbumPanel',query:{albumId: item.al.id}}" class="elipse" style="width: 100%;font-size: 14px">{{item.al.name}}</router-link></el-col>
+                <el-col :span="2"><span class="time">{{timeFormat(item.dt/1000)}}</span></el-col>
+              </el-row>
+            </div>
+            <div :key="item.id" v-for="(item,index) in key_tracks.slice(9)" >
+              <el-row v-if="item.id === $store.state.currentMusic.id" :gutter="20" class="song" >
+                <el-col :span="4" class="icon">
+                  <i class="iconfont icon-laba index" style="color: #ec4141"></i>
+                  <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
+                  <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index+9].res"></i>
+                  <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index+9].res"></i>
+                  <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
+                </el-col>
+                <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
+                  <div class="left-box elipse">
+                    <span class="name" >{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col v-else :span="8" class="title nouse">
+                  <div class="left-box elipse">
+                    <span class="name" style="color: #9f9f9f">{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col :span="4" >
+            <span class="elipse" style="width: 100%;font-size: 14px">
+              <span class="artistName" :key="artist.name" v-for="(artist,index) in item.ar.slice(0,5)">
+                <span v-if="artist.id === 0" class="nouse">{{artist.name}}</span>
+                <router-link :to="{name:'SingerPanel',query:{singerId:artist.id}}" v-else>{{artist.name}}</router-link>
+                <span v-if="index<item.ar.length-1" class="nouse"> / </span>
+              </span>
+              <template v-if="item.ar.length>5">...</template>
+            </span>
+                </el-col>
+                <el-col :span="6"><router-link :to="{path:'AlbumPanel',query:{albumId: item.al.id}}" class="elipse" style="width: 100%;font-size: 14px">{{item.al.name}}</router-link></el-col>
+                <el-col :span="2"><span class="time">{{timeFormat(item.dt/1000)}}</span></el-col>
+              </el-row>
+              <el-row v-else :gutter="20" class="song">
+                <el-col :span="4" class="icon">
+                  <span class="index">{{ index+10 }}</span>
+                  <i class="iconfont icon-bofang" @click="playClickSong(item)"></i>
+                  <i class="iconfont icon-xihuan" @click="likeSong(item.id,false,item)" style="color: #ec4141;" v-show="likeStatus[index+9].res"></i>
+                  <i class="iconfont icon-aixin" @click="likeSong(item.id,true,item)" v-show="!likeStatus[index+9].res"></i>
+                  <i class="iconfont icon-cangpeitubiao_xiazaipandiandanxiazaidayinmoban" @click="download(item.id,item.name)"></i>
+                </el-col>
+                <el-col v-if="item.noCopyrightRcmd===null" :span="8" class="title">
+                  <div class="left-box elipse">
+                    <span class="name" >{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col v-else :span="8" class="title nouse">
+                  <div class="left-box elipse">
+                    <span class="name" style="color: #9f9f9f">{{ item.name.slice(0,50) }}<template v-if="item.name.length>50">...</template></span>
+                    <span v-if="item.alia.length>0 && item.name.length<=50" class="alias">(<span :key="alia" v-for="alia in item.alia">{{alia}}</span>)</span>
+                  </div>
+                  <div class="right-box">
+                    <span v-if="item.fee === 1">VIP</span>
+                    <router-link v-if="item.mv!==0" :to="{path:'/VideoPanel',query:{videoId:item.mv,type:'mv'}}" >MV<i class="iconfont icon-youjiantou"></i></router-link>
+                  </div>
+                </el-col>
+                <el-col :span="4" >
+            <span class="elipse" style="width: 100%;font-size: 14px">
+              <span class="artistName" :key="artist.name" v-for="(artist,index) in item.ar.slice(0,5)">
+                <span v-if="artist.id === 0" class="nouse">{{artist.name}}</span>
+                <router-link :to="{name:'SingerPanel',query:{singerId:artist.id}}" v-else>{{artist.name}}</router-link>
+                <span v-if="index<item.ar.length-1" class="nouse"> / </span>
+              </span>
+              <template v-if="item.ar.length>5">...</template>
+            </span>
+                </el-col>
+                <el-col :span="6"><router-link :to="{path:'AlbumPanel',query:{albumId: item.al.id}}" class="elipse" style="width: 100%;font-size: 14px">{{item.al.name}}</router-link></el-col>
+                <el-col :span="2"><span class="time">{{timeFormat(item.dt/1000)}}</span></el-col>
+              </el-row>
+            </div>
           </div>
         </div>
       </template>
@@ -456,7 +628,7 @@
 import Loading from '@/components/Loading'
 export default {
   name: 'SongLists',
-  props: ['tracks', 'type', 'islistload'],
+  props: ['tracks', 'type', 'islistload', 'keyword'],
   components: {
     Loading
   },
@@ -467,6 +639,7 @@ export default {
       isload: false,
       arr: [],
       c_tracks: this.tracks.slice(0, 999),
+      key_tracks: [],
       currentBottom: 1000,
       step: 1000,
       isallLoad: false,
@@ -495,6 +668,15 @@ export default {
         this.c_tracks = newVal.slice(0, 999)
         this.currentBottom = 20
         this.view_panel.addEventListener('scroll', this.bottomLoad)
+      }
+    },
+    keyword (newVal) {
+      if (newVal === '') {
+        this.key_tracks = this.tracks
+      } else {
+        this.key_tracks = this.tracks.filter(val => {
+          return val.name.indexOf(newVal) !== -1
+        })
       }
     }
   },

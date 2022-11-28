@@ -58,11 +58,15 @@
               <SongList v-if="active === '1' && !isMylikelist"
                         :type="'songList'"
                         :islistload = "islistload"
-                        :tracks="keyWordTracks"></SongList>
+                        :tracks="playlistInfo.tracks"
+                        :keyword="keyword"
+              ></SongList>
               <SongList v-if="active === '1' && isMylikelist"
                         :type="'songList'"
                         :islistload = "islistload"
-                        :tracks="keyWordTracks"></SongList>
+                        :tracks="playlistInfo.tracks"
+                        :keyword="keyword"
+              ></SongList>
               <CommentList :cid="playlistInfo.id"
                            v-show="active === '2'"
                            :count="playlistInfo.commentCount"
@@ -293,17 +297,6 @@ export default {
       return this.playlistInfo.subscribedCount > 10000 ? Math.floor(this.playlistInfo.subscribedCount / 10000) + '万' : this.playlistInfo.subscribedCount
     },
     // eslint-disable-next-line vue/return-in-computed-property
-    keyWordTracks () {
-      if (this.keyword === '') { return this.playlistInfo.tracks } else if (!this.isMylikelist) {
-        return this.playlistInfo.tracks.filter(val => {
-          return val.name.indexOf(this.keyword) !== -1
-        })
-      } else if (this.isMylikelist) {
-        return this.$store.state.mylikeList.track.filter(val => {
-          return val.name.indexOf(this.keyword) !== -1
-        })
-      }
-    },
     playNum () {
       return this.playlistInfo.playCount > 10000 ? Math.floor(this.playlistInfo.playCount / 10000) + '万' : this.playlistInfo.playCount
     }
