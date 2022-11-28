@@ -21,6 +21,7 @@ export default {
         this.$store.state.islogin = false
         this.$http.get('/register/anonimous').then(res => {
           localStorage.setItem('cookie', res.data.cookie)
+          this.$router.push('/')
           location.reload()
           this.$message({
             type: 'success',

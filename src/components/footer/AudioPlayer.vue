@@ -480,7 +480,6 @@ export default {
       }
     },
     async playMethod (newVal, oldVal) {
-      localStorage.setItem('playMethod', newVal)
       if (newVal === 2 && !this.$store.state.islogin) {
         // 如果没登陆就自动跳过登录模式
         this.$store.state.playMethod++
@@ -492,6 +491,7 @@ export default {
             pid: this.$store.state.mylikeListid
           }
         })
+        localStorage.setItem('playMethod', newVal)
         const xindongList = []
         xindongList.push(this.currentMusic)
         res.data.data.forEach(val => {
@@ -499,7 +499,7 @@ export default {
         })
         localStorage.setItem('normalHistoryList', JSON.stringify(this.$store.state.playsongList))
         this.$store.commit('PUSHXINDONGLIST', xindongList)
-      } else if (oldVal === 2) {
+      } else if (oldVal === 2 && this.$store.state.islogin) {
         if (localStorage.getItem('normalHistoryList')) {
           this.$store.commit('UPDATESONGLIST', JSON.parse(localStorage.getItem('normalHistoryList')))
         }

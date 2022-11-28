@@ -70,12 +70,14 @@ export default {
     }
   },
   mounted () {
-    if (this.playStatus) {
-      this.$refs.cover.classList.add('cover-play')
-      this.$refs.pointer.classList.add('pointer-play')
-    } else {
-      this.$refs.cover.classList.remove('cover-play')
-      this.$refs.pointer.classList.remove('pointer-play')
+    if (this.$refs.cover && this.$refs.pointer) {
+      if (this.playStatus) {
+        this.$refs.cover.classList.add('cover-play')
+        this.$refs.pointer.classList.add('pointer-play')
+      } else {
+        this.$refs.cover.classList.remove('cover-play')
+        this.$refs.pointer.classList.remove('pointer-play')
+      }
     }
   }
 }
